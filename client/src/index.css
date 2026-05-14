@@ -1,6 +1,12 @@
 /* Add Leaflet CSS */
 @import 'leaflet/dist/leaflet.css';
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+html.font-arabic {
+  font-family: 'Cairo', sans-serif;
+}
+
 
 :root {
   --primary: #009FAC;

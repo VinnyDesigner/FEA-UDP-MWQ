@@ -1,6 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { Maximize2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const sondeData = [
   { time: '17 Feb 2026', hour: '9:30AM', temp: 5 },
@@ -51,10 +52,76 @@ const CustomXAxisTick = ({ x, y, payload }) => {
   );
 };
 
-const TemperatureChart = ({ activeTab, isMobile = false }) => {
+const CustomTooltip = ({ active, payload, label, selectedMetric }) => {
+  const { t } = useTranslation();
+  if (active && payload && payload.length) {
+    return (
+      <div 
+        className="backdrop-blur-[20px] border border-white/10 p-5 rounded-[20px] shadow-2xl min-w-[220px]"
+        style={{
+          background: 'rgba(255, 255, 255, 0.85)',
+        }}
+      >
+        <div className="flex flex-col gap-1.5 ltr:text-left rtl:text-right">
+          <p className="text-[13px] text-[#072227]">
+            <span className="font-bold opacity-90">{t('analytics.parameters')} :</span> <span className="opacity-80">{selectedMetric?.split('(')[0].trim() || 'Temperature'}</span>
+          </p>
+          <p className="text-[13px] text-[#072227]">
+            <span className="font-bold opacity-90">{t('analytics.station')} :</span> <span className="opacity-80">{t('analytics.stationName')}</span>
+          </p>
+          <p className="text-[13px] text-[#072227]">
+            <span className="font-bold opacity-90">{t('analytics.details')} :</span> <span className="opacity-80">{payload[0].value.toFixed(2)}</span>
+          </p>
+          <p className="text-[13px] text-[#072227]">
+            <span className="font-bold opacity-90">{t('analytics.dateTime')} :</span> <span className="opacity-80">{label.replace('\\n', ' ')}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+const TemperatureChart = ({ activeTab, selectedBuoy, selectedMetric, isMobile = false }) => {
+  const { t } = useTranslation();
   const isWeather = activeTab === 'Weather';
   const rawData = isWeather ? weatherData : sondeData;
-  const currentData = rawData.map(d => ({ ...d, label: `${d.time},\n${d.hour}` }));
+  
+  // Pseudo-dynamic data generation based on selectedBuoy and selectedMetric
+  const getDynamicData = () => {
+    const seed = (selectedBuoy?.id || 1) + (selectedMetric?.length || 0);
+    return rawData.map((d, index) => {
+      const variation = Math.sin(seed + index) * 5;
+      return {
+        ...d,
+        label: `${d.time},\n${d.hour}`,
+        value: Math.max(0, d.temp + variation)
+      };
+    });
+  };
+
+  const currentData = getDynamicData();
+  const metricName = selectedMetric || (isWeather ? 'Air Temperature (°c)' : 'Water Temperature (°c)');
+  
+  const metricKeyMap = {
+    'Water Temperature (°c)': 'dashboard.waterTemperature',
+    'Salinity (ppt)': 'dashboard.salinity',
+    'Chlorophyll (ug)': 'dashboard.chlorophyll',
+    'Dissolved Oxygen (mg/l)': 'dashboard.dissolvedOxygen',
+    'pH': 'dashboard.ph',
+    'Turbidity (NTU)': 'dashboard.turbidity',
+    'Blue-Green Algae (ug)': 'dashboard.blueGreenAlgae',
+    'Depth(m)': 'dashboard.depth',
+    'Specific Conductivity(uS)': 'dashboard.specificConductivity',
+    'Air Temperature (°c)': 'dashboard.airTemperature',
+    'Relative Humidity (%)': 'dashboard.relativeHumidity',
+    'AWS (m/s)': 'dashboard.aws',
+    'AWD (Degree)': 'dashboard.awd',
+    'Wind Gust (Wind Gust)': 'dashboard.windGust',
+    'Pressure (bar)': 'dashboard.pressure'
+  };
+
+  const translatedTitle = metricKeyMap[metricName] ? t(metricKeyMap[metricName]) : metricName;
 
   return (
     <div 
@@ -70,7 +137,7 @@ const TemperatureChart = ({ activeTab, isMobile = false }) => {
     >
       <div className={`flex justify-between items-start ${isMobile ? 'mb-2' : 'mb-4'}`}>
         <h3 className={`${isMobile ? 'text-[15px]' : 'text-[19px]'} font-bold text-[#072227] tracking-tight`}>
-          {isWeather ? 'Air Temperature' : 'Water Temperature'} (°c)
+          {translatedTitle}
         </h3>
         <button className="text-gray-400 hover:text-[#009FAC] transition-all p-1 bg-white/60 rounded-lg shadow-sm border border-white/40">
           <Maximize2 size={10} />
@@ -79,60 +146,42 @@ const TemperatureChart = ({ activeTab, isMobile = false }) => {
 
       <div className="flex-1 w-full min-h-0">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={currentData} margin={{ top: 5, right: 10, left: 0, bottom: 20 }}>
+          <AreaChart data={currentData} margin={{ top: 10, right: 30, left: -20, bottom: 20 }}>
             <defs>
               <linearGradient id="colorTemp" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#1DCDDD" stopOpacity={0.25}/>
+                <stop offset="5%" stopColor="#1DCDDD" stopOpacity={0.3}/>
                 <stop offset="95%" stopColor="#1DCDDD" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={true} stroke="rgba(0,0,0,0.08)" />
+            <CartesianGrid strokeDasharray="5 5" vertical={true} stroke="rgba(0,0,0,0.1)" strokeOpacity={0.2} />
             <XAxis 
               dataKey="label" 
-              axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-              tickLine={{ stroke: 'rgba(0,0,0,0.2)', transform: 'translate(0, -6)' }}
+              axisLine={false}
+              tickLine={false}
               tick={<CustomXAxisTick />}
               interval={0}
               height={50}
             />
             <YAxis 
-              axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-              tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-              tick={<CustomYAxisTick />}
-              domain={[0, 80]}
-              ticks={[0, 20, 40, 60, 80]}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 11, fill: "rgba(0,0,0,0.45)", fontWeight: 500 }}
+              domain={['auto', 'auto']}
               width={45}
             />
             <Tooltip 
-              contentStyle={{ 
-                borderRadius: '12px', 
-                border: '1px solid rgba(255,255,255,0.8)', 
-                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                background: 'rgba(255,255,255,0.9)',
-                backdropFilter: 'blur(4px)'
-              }}
-              itemStyle={{ color: '#009FAC', fontWeight: 'bold' }}
+              content={<CustomTooltip selectedMetric={selectedMetric} />} 
+              cursor={{ stroke: 'rgba(0,159,172,0.2)', strokeWidth: 1, strokeDasharray: '5 5' }} 
             />
             <Area 
               type="monotone" 
-              dataKey="temp" 
+              dataKey="value" 
               stroke="#1DCDDD" 
-              strokeWidth={2}
+              strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorTemp)"
-              dot={(props) => {
-                if (props.index === currentData.length - 1) {
-                  return (
-                    <g key="end-dot">
-                      <circle cx={props.cx} cy={props.cy} r={6} fill="#1DCDDD" fillOpacity={0.15} />
-                      <circle cx={props.cx} cy={props.cy} r={3} fill="white" stroke="#1DCDDD" strokeWidth={2} />
-                      <line x1={props.cx} y1={props.cy} x2={props.cx} y2={220} stroke="#1DCDDD" strokeDasharray="3 3" strokeOpacity={0.4} />
-                    </g>
-                  );
-                }
-                return null;
-              }}
-              activeDot={{ r: 5, fill: '#1DCDDD', stroke: '#fff', strokeWidth: 2 }}
+              dot={{ r: 4, fill: '#ffffff', stroke: '#1DCDDD', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: '#ffffff', stroke: '#1DCDDD', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

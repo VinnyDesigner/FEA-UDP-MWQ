@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const SensorDataFilters = ({ isMobile = false }) => {
+  const { t } = useTranslation();
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const dateBtnRef = useRef(null);
@@ -54,6 +56,17 @@ const SensorDataFilters = ({ isMobile = false }) => {
     'Last One Month', 'Last Two Months', 'Last Three Months', 'Choose Period'
   ];
 
+  const timeRangeKeyMap = {
+    'Last Hour': 'analytics.timeLastHour',
+    'Today': 'analytics.timeToday',
+    'Last One Week': 'analytics.timeOneWeek',
+    'Last Two Week': 'analytics.timeTwoWeek',
+    'Last One Month': 'analytics.timeOneMonth',
+    'Last Two Months': 'analytics.timeTwoMonths',
+    'Last Three Months': 'analytics.timeThreeMonths',
+    'Choose Period': 'analytics.timeChoosePeriod'
+  };
+
   const filterStyle = {
     borderRadius: '24px',
     border: '1px solid rgba(255, 255, 255, 0.30)',
@@ -71,7 +84,7 @@ const SensorDataFilters = ({ isMobile = false }) => {
         className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs transition-all hover:brightness-110 active:scale-95 w-full lg:w-auto justify-center lg:justify-start"
         style={filterStyle}
       >
-        <span className="whitespace-nowrap text-ellipsis overflow-hidden">Sonde Information</span>
+        <span className="whitespace-nowrap text-ellipsis overflow-hidden">{t('analytics.sondeInformation')}</span>
         <ChevronDown size={14} className="text-white/70 flex-shrink-0" />
       </button>
 
@@ -83,7 +96,7 @@ const SensorDataFilters = ({ isMobile = false }) => {
         style={filterStyle}
       >
         <Calendar size={14} className="text-white/70 flex-shrink-0" />
-        <span className="whitespace-nowrap">Today</span>
+        <span className="whitespace-nowrap">{t('analytics.timeToday')}</span>
         <ChevronDown size={14} className={`transition-transform duration-300 ${isDateOpen ? 'rotate-180' : ''} text-white/70 flex-shrink-0`} />
       </button>
 
@@ -109,7 +122,7 @@ const SensorDataFilters = ({ isMobile = false }) => {
                 <div className={`w-[20px] h-[20px] rounded-full border-2 flex items-center justify-center transition-all ${range === 'Today' ? 'border-white' : 'border-white/30 group-hover:border-white/50'}`}>
                   {range === 'Today' && <div className="w-[10px] h-[10px] bg-white rounded-full" />}
                 </div>
-                <span className="text-white text-[15px] font-medium">{range}</span>
+                <span className="text-white text-[15px] font-medium">{t(timeRangeKeyMap[range])}</span>
               </label>
             ))}
           </div>
@@ -120,7 +133,7 @@ const SensorDataFilters = ({ isMobile = false }) => {
               onClick={() => setIsDateOpen(false)}
               className="text-white text-[16px] font-semibold hover:text-[#19D9F3] transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button 
               className="w-full sm:w-auto px-10 h-[44px] text-white text-[15px] font-bold tracking-wide flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
@@ -130,7 +143,7 @@ const SensorDataFilters = ({ isMobile = false }) => {
                 boxShadow: '0 0 40px 0 rgba(0, 159, 172, 0.30), 0 0 1px 4px rgba(255, 255, 255, 0.10)'
               }}
             >
-              Apply Filters
+              {t('common.filter')}
             </button>
           </div>
         </div>,

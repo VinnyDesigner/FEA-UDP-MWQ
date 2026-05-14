@@ -3,8 +3,10 @@ import Sidebar from '../components/Sidebar';
 import MobileHeader from '../components/MobileHeader';
 import MobileSidebar from '../components/MobileSidebar';
 import FAQAccordion from '../components/FAQAccordion';
+import { useTranslation } from 'react-i18next';
 
 const FAQPage = () => {
+  const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -33,10 +35,10 @@ const FAQPage = () => {
           {/* Header Section */}
           <div className="flex flex-col mb-4">
             <h1 className="text-[28px] md:text-[36px] font-bold text-white tracking-tight leading-[1.2]">
-              Frequently Asked Questions
+              {t('faq.pageTitle', 'Frequently Asked Questions')}
             </h1>
             <p className="text-[14px] md:text-[16px] text-gray-400 mt-3 max-w-[95%] md:max-w-[80%] leading-relaxed opacity-75">
-              Everything you need to know—answered clearly and concisely.
+              {t('faq.pageSubtitle', 'Everything you need to know—answered clearly and concisely.')}
             </p>
           </div>
 
@@ -62,10 +64,10 @@ const FAQPage = () => {
         {/* Header Section (Inside Panel) */}
         <div className="flex flex-col mb-10">
           <h1 className="text-xl font-bold text-white tracking-tight">
-            Frequently Asked Questions
+            {t('faq.pageTitle', 'Frequently Asked Questions')}
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Everything you need to know—answered clearly and concisely.
+            {t('faq.pageSubtitle', 'Everything you need to know—answered clearly and concisely.')}
           </p>
         </div>
 

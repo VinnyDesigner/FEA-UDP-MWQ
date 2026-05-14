@@ -9,8 +9,10 @@ import BuoysChart from '../components/BuoysChart';
 import AnalyticsTable from '../components/AnalyticsTable';
 import SensorDataTable from '../components/SensorDataTable';
 import DataCaptureRateTable from '../components/DataCaptureRateTable';
+import { useTranslation } from 'react-i18next';
 
 const MISAnalyticsPage = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('Buoys Analytics');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -40,16 +42,16 @@ const MISAnalyticsPage = () => {
           {/* Header Section */}
           <div className="flex flex-col">
             <h1 className="text-[28px] md:text-[32px] font-bold text-white tracking-tight leading-[1.2]">
-              Marine Water Quality Monitoring Dashboard - MIS Analytics
+              {t('analytics.pageTitle')}
             </h1>
             <p className="text-[13px] md:text-[15px] text-gray-400 mt-3 max-w-[90%] md:max-w-none">
-              Dedicated parameter records for performance tracking and environmental analysis.
+              {t('analytics.pageSubtitle')}
             </p>
           </div>
 
           {/* Controls Row */}
           <div className="flex flex-col gap-6">
-            <div className="w-full overflow-x-auto no-scrollbar pb-1">
+            <div className="w-full pb-1">
               <AnalyticsTabs activeTab={activeTab} onTabChange={setActiveTab} isMobile={true} />
             </div>
             <div className="w-full">
@@ -102,10 +104,10 @@ const MISAnalyticsPage = () => {
         {/* Header Section (Inside Panel) */}
         <div className="flex flex-col mb-6">
           <h1 className="text-xl font-bold text-white tracking-tight">
-            Marine Water Quality Monitoring Dashboard - MIS Analytics
+            {t('analytics.pageTitle')}
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Dedicated parameter records for performance tracking and environmental analysis.
+            {t('analytics.pageSubtitle')}
           </p>
         </div>
 
@@ -117,42 +119,77 @@ const MISAnalyticsPage = () => {
 
         {/* Content Section (Unified Inner Container) */}
         <div className="flex-1 flex flex-col min-h-0">
-          
+
           {/* Main Data Panel */}
           <div 
-            className="flex-1 flex flex-col p-6 min-h-0"
+            className="flex-1 flex flex-col min-h-0"
             style={{
               borderRadius: '30px',
               border: '1px solid rgba(0, 0, 0, 0.10)',
               background: 'radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.14) 100%)',
               backdropFilter: 'blur(10px)',
-              overflow: 'hidden'
+              overflow: 'hidden',
             }}
           >
+            <style>{`
+              .analytics-panel-scroll::-webkit-scrollbar {
+                width: 6px;
+              }
+              .analytics-panel-scroll::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 10px;
+              }
+              .analytics-panel-scroll::-webkit-scrollbar-thumb {
+                background: rgba(29, 205, 221, 0.2);
+                border-radius: 10px;
+                transition: all 0.3s ease;
+              }
+              .analytics-panel-scroll::-webkit-scrollbar-thumb:hover {
+                background: rgba(29, 205, 221, 0.4);
+              }
+            `}</style>
+
             {activeTab === 'Buoys Analytics' ? (
-              <>
-                {/* Chart Section */}
-                <div className="flex-shrink-0 h-[52%] min-h-0 w-full flex flex-col">
-                  <BuoysChart />
+              <div className="flex flex-col h-full min-h-0">
+                {/* Sticky Header: Title + Download — never scrolls */}
+                <div className="flex-shrink-0 flex justify-between items-center px-6 pt-6 pb-4">
+                  <h2 className="text-[18px] font-bold text-white leading-tight">{t('analytics.buoysOverview')}</h2>
+                  <button
+                    className="flex items-center gap-2 px-6 py-2 text-[14px] transition-all hover:brightness-110 active:scale-95"
+                    style={{
+                      borderRadius: '24px',
+                      border: '1px solid rgba(255, 255, 255, 0.30)',
+                      background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                      boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
+                      color: '#FFFFFF',
+                      fontWeight: '400',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                  >
+                    {t('common.download')}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto no-scrollbar">
-                  <style>{`
-                    .no-scrollbar::-webkit-scrollbar {
-                      display: none;
-                    }
-                    .no-scrollbar {
-                      -ms-overflow-style: none;
-                      scrollbar-width: none;
-                    }
-                  `}</style>
-                  <AnalyticsTable />
+                {/* Scrollable body: chart + legend + table */}
+                <div className="flex-1 overflow-y-auto analytics-panel-scroll min-h-0 px-6 pb-6">
+                  {/* Chart (no header — handled above) */}
+                  <BuoysChart showHeader={false} />
+
+                  {/* Gap + Table */}
+                  <div className="mt-6">
+                    <AnalyticsTable />
+                  </div>
                 </div>
-              </>
-                        ) : (activeTab === 'Data Capture Rate' || activeTab === 'Valid Data Capture Rate') ? (
-              <DataCaptureRateTable activeTab={activeTab} />
+              </div>
+            ) : (activeTab === 'Data Capture Rate' || activeTab === 'Valid Data Capture Rate') ? (
+              <div className="p-6 flex-1 min-h-0 overflow-y-auto analytics-panel-scroll">
+                <DataCaptureRateTable activeTab={activeTab} />
+              </div>
             ) : (
-              <SensorDataTable />
+              <div className="p-6 flex-1 min-h-0 overflow-y-auto analytics-panel-scroll">
+                <SensorDataTable />
+              </div>
             )}
           </div>
         </div>

@@ -1,17 +1,20 @@
 import React from 'react';
 import { X, LogOut, User } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import logo from '../assets/logo.png';
+import LanguageSelector from './LanguageSelector';
 
 const navItems = [
-  { icon: '/assets/nav/home.png', label: 'Dashboard', path: '/dashboard' },
-  { icon: '/assets/nav/analytics.png', label: 'MIS Analytics', path: '/mis-analytics' },
-  { icon: '/assets/nav/reports.png', label: 'Reports', path: '/reports' },
-  { icon: '/assets/nav/help.png', label: 'Frequently Asked Questions', path: '/faq' },
+  { icon: '/assets/nav/home.png', labelKey: 'nav.dashboard', path: '/dashboard' },
+  { icon: '/assets/nav/analytics.png', labelKey: 'nav.misAnalytics', path: '/mis-analytics' },
+  { icon: '/assets/nav/reports.png', labelKey: 'nav.reports', path: '/reports' },
+  { icon: '/assets/nav/help.png', labelKey: 'nav.faq', path: '/faq' },
 ];
 
 const MobileSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -23,11 +26,14 @@ const MobileSidebar = ({ isOpen, onClose }) => {
 
       {/* Drawer */}
       <aside 
-        className={`fixed top-0 left-0 bottom-0 w-[280px] z-[1200] flex flex-col p-6 transition-transform duration-300 ease-out lg:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-0 ltr:left-0 rtl:right-0 bottom-0 w-[280px] z-[1200] flex flex-col p-6 transition-transform duration-300 ease-out lg:hidden ${
+          isOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full'
+        }`}
         style={{
           background: 'linear-gradient(180deg, #072227 0%, #05191D 100%)',
           boxShadow: '10px 0 30px rgba(0, 0, 0, 0.5)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.05)'
+          borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.05)'
         }}
       >
         {/* Header inside drawer */}
@@ -40,9 +46,9 @@ const MobileSidebar = ({ isOpen, onClose }) => {
 
         {/* Navigation Items */}
         <nav className="flex flex-col gap-4">
-          {navItems.map(({ icon, label, path }) => (
+          {navItems.map(({ icon, labelKey, path }) => (
             <NavLink
-              key={label}
+              key={labelKey}
               to={path}
               onClick={onClose}
               className={({ isActive }) => `flex items-center gap-4 p-4 rounded-xl transition-all ${isActive ? 'bg-[#1DCDDD]/10 border border-[#1DCDDD]/20' : 'hover:bg-white/5'}`}
@@ -51,12 +57,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 <>
                   <img 
                     src={icon} 
-                    alt={label} 
+                    alt={t(labelKey)} 
                     className="w-5 h-5 object-contain" 
                     style={{ opacity: isActive ? 1 : 0.6 }}
                   />
                   <span className={`text-[15px] ${isActive ? 'text-[#1DCDDD] font-semibold' : 'text-white/80'}`}>
-                    {label}
+                    {t(labelKey)}
                   </span>
                 </>
               )}
@@ -66,18 +72,19 @@ const MobileSidebar = ({ isOpen, onClose }) => {
 
         {/* Footer */}
         <div className="mt-auto flex flex-col gap-4 pt-6 border-t border-white/10">
-          <div className="flex items-center gap-4 p-4 text-white/80">
-            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+          <LanguageSelector />
+          <div className="flex items-center gap-4 px-4 py-2 text-white/80 mt-2">
+            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
               <User size={20} />
             </div>
-            <span className="text-[15px] font-medium">User Profile</span>
+            <span className="text-[15px] font-medium">{t('nav.userProfile')}</span>
           </div>
           <button 
             onClick={() => navigate('/signin')}
-            className="flex items-center gap-4 p-4 text-white/60 hover:text-white transition-colors"
+            className="flex items-center gap-4 px-4 py-2 text-white/60 hover:text-white transition-colors"
           >
-            <LogOut size={20} />
-            <span className="text-[15px]">Sign Out</span>
+            <LogOut size={20} className="rtl:rotate-180 flex-shrink-0" />
+            <span className="text-[15px]">{t('nav.logout')}</span>
           </button>
         </div>
       </aside>

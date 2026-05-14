@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const sensorData = [
   {
@@ -61,6 +62,7 @@ const sensorData = [
 ];
 
 const SensorDataTable = ({ isMobile = false }) => {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* --- MOBILE VIEW: Sensor Data Cards (< 768px) --- */}
@@ -80,11 +82,11 @@ const SensorDataTable = ({ isMobile = false }) => {
             {/* Header: Station & Time */}
             <div className="flex flex-col gap-2 pb-3 border-b border-white/10">
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">Station</span>
+                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.station')}</span>
                 <span className="text-[18px] font-bold text-white">{row.station}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">Date & Time</span>
+                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.dateTime')}</span>
                 <span className="text-[15px] font-semibold text-[#1DCDDD]">{row.dateTime}</span>
               </div>
             </div>
@@ -92,43 +94,43 @@ const SensorDataTable = ({ isMobile = false }) => {
             {/* Parameter Grid */}
             <div className="grid grid-cols-2 gap-y-4 gap-x-6">
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Specific Conductivity</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.specificConductivity')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.conductivity}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Water Temp</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.waterTemperature')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.temp}°C</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Salinity</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.salinity')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.salinity}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Chlorophyll</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.chlorophyll')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.chlorophyll}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Oxygen Saturation</span>
+                <span className="text-[12px] font-medium text-white/60">{t('analytics.oxygenSaturation')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.oxygenSat}%</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Dissolved Oxygen</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.dissolvedOxygen')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.dissolvedOxygen}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Turbidity</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.turbidity')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.turbidity}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">pH</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.ph')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.ph}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Depth</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.depth')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.depth}m</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">Blue Green Algae</span>
+                <span className="text-[12px] font-medium text-white/60">{t('dashboard.blueGreenAlgae')}</span>
                 <span className="text-[16px] font-bold text-white/90">{row.algae}</span>
               </div>
             </div>
@@ -143,7 +145,7 @@ const SensorDataTable = ({ isMobile = false }) => {
           {/* 1. Left Fixed Column */}
           <div className="flex-shrink-0 flex flex-col border-r border-white/10 w-[180px]">
             <div className="px-6 py-3 text-white text-[14px] font-bold border-b border-white/10 flex items-center gap-2 h-[50px] leading-tight sticky top-0 z-10 bg-transparent">
-              Station Name <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
+              {t('analytics.stationName')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
             </div>
             <div className="flex-1">
               {sensorData.map((row, index) => (
@@ -155,28 +157,40 @@ const SensorDataTable = ({ isMobile = false }) => {
           </div>
 
           {/* 2. Middle Scrollable Columns - Table Auto for dynamic width */}
-          <div className="flex-1 overflow-x-auto scrollbar-hide flex flex-col min-w-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="flex-1 overflow-x-auto custom-scrollbar flex flex-col min-w-0">
             <style dangerouslySetInnerHTML={{__html: `
-              .scrollbar-hide::-webkit-scrollbar {
-                display: none;
+              .custom-scrollbar::-webkit-scrollbar {
+                height: 6px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 10px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(29, 205, 221, 0.2);
+                border-radius: 10px;
+                transition: all 0.3s ease;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(29, 205, 221, 0.4);
               }
             `}} />
             <table className="w-full border-collapse table-auto">
               <thead>
                 <tr className="border-b border-white/10 h-[50px]">
                   {[
-                    'Date & Time',
-                    'Specific Conductivity',
-                    'Water Temperature',
-                    'Salinity',
-                    'Chlorophyll',
-                    'Oxygen Saturation',
-                    'Dissolved Oxygen',
-                    'Turbidity',
-                    'pH',
-                    'Depth'
+                    t('analytics.dateTime'),
+                    t('dashboard.specificConductivity'),
+                    t('dashboard.waterTemperature'),
+                    t('dashboard.salinity'),
+                    t('dashboard.chlorophyll'),
+                    t('analytics.oxygenSaturation'),
+                    t('dashboard.dissolvedOxygen'),
+                    t('dashboard.turbidity'),
+                    t('dashboard.ph'),
+                    t('dashboard.depth')
                   ].map((label, idx) => (
-                    <th key={idx} className="px-6 py-3 text-white text-[14px] font-bold text-left whitespace-nowrap leading-tight sticky top-0 z-10 bg-transparent">
+                    <th key={idx} className="px-6 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 z-10 bg-transparent">
                       <div className="flex items-center gap-2">
                         {label} <ArrowUpDown size={14} className="flex-shrink-0 text-white/60" />
                       </div>
@@ -206,7 +220,7 @@ const SensorDataTable = ({ isMobile = false }) => {
           {/* 3. Right Fixed Column */}
           <div className="flex-shrink-0 flex flex-col border-l border-white/10 w-[180px]">
             <div className="px-6 py-3 text-white text-[14px] font-bold border-b border-white/10 flex items-center gap-2 h-[50px] leading-tight sticky top-0 z-10 bg-transparent">
-              Blue Green Algae <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
+              {t('dashboard.blueGreenAlgae')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
             </div>
             <div className="flex-1">
               {sensorData.map((row, index) => (
@@ -231,7 +245,7 @@ const SensorDataTable = ({ isMobile = false }) => {
             color: '#FFFFFF'
           }}
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft size={18} className="rtl:rotate-180" />
         </button>
         {[1, 2, 3, 4, 5].map((page) => (
           <button 
@@ -267,7 +281,7 @@ const SensorDataTable = ({ isMobile = false }) => {
             color: '#FFFFFF'
           }}
         >
-          <ChevronRight size={18} />
+          <ChevronRight size={18} className="rtl:rotate-180" />
         </button>
       </div>
     </div>

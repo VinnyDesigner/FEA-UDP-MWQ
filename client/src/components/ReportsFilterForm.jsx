@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Calendar, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ReportsFilterForm = () => {
+  const { t } = useTranslation();
   const initialState = {
     station: 'Al Aqah New',
     monitoringType: 'Sonde Information',
@@ -76,13 +78,13 @@ const ReportsFilterForm = () => {
         {/* Row 1: 4 Dropdowns - Responsive Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 relative z-30">
           <div className="flex flex-col relative">
-            <label className={labelClass}>Station</label>
+            <label className={labelClass}>{t('analytics.station')}</label>
             <button 
               ref={stationBtnRef}
               className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}
               onClick={() => setIsStationOpen(!isStationOpen)}
             >
-              {formData.station}
+              {formData.station === 'Al Aqah New' ? t('analytics.stationName') : formData.station}
               <ChevronDown size={14} className={`transition-transform duration-300 ${isStationOpen ? 'rotate-180' : ''} text-white/70`} />
             </button>
 
@@ -111,7 +113,7 @@ const ReportsFilterForm = () => {
                       setIsStationOpen(false);
                     }}
                   >
-                    {station}
+                    {station === 'Al Aqah New' ? t('analytics.stationName') : station}
                   </button>
                 ))}
               </div>,
@@ -119,23 +121,23 @@ const ReportsFilterForm = () => {
             )}
           </div>
           <div className="flex flex-col">
-            <label className={labelClass}>Monitoring Type</label>
+            <label className={labelClass}>{t('reports.monitoringType', 'Monitoring Type')}</label>
             <button className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}>
-              {formData.monitoringType}
+              {formData.monitoringType === 'Sonde Information' ? t('analytics.sondeInformation') : formData.monitoringType}
               <ChevronDown size={14} className="text-white/70" />
             </button>
           </div>
           <div className="flex flex-col">
-            <label className={labelClass}>Parameters</label>
+            <label className={labelClass}>{t('analytics.parameters')}</label>
             <button className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}>
-              {formData.parameter}
+              {formData.parameter === 'Blue Green Algae' ? t('dashboard.blueGreenAlgae') : formData.parameter}
               <ChevronDown size={14} className="text-white/70" />
             </button>
           </div>
           <div className="flex flex-col">
-            <label className={labelClass}>Type</label>
+            <label className={labelClass}>{t('reports.type', 'Type')}</label>
             <button className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}>
-              {formData.type}
+              {formData.type === 'Raw' ? t('reports.raw', 'Raw') : formData.type}
               <ChevronDown size={14} className="text-white/70" />
             </button>
           </div>
@@ -145,27 +147,27 @@ const ReportsFilterForm = () => {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-row gap-5 md:gap-6 flex-1 w-full lg:max-w-[50%]">
             <div className="flex flex-col flex-1">
-              <label className={labelClass}>Start Date</label>
+              <label className={labelClass}>{t('reports.startDate', 'Start Date')}</label>
               <div className="relative mt-2">
                 <input 
                   type="text" 
                   value="1 Jan 2026" 
                   readOnly
-                  className="w-full h-[52px] md:h-[56px] px-4 pl-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-default"
+                  className="w-full h-[52px] md:h-[56px] px-4 ltr:pl-12 rtl:pr-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-default ltr:text-left rtl:text-right"
                 />
-                <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70" />
+                <Calendar size={14} className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-white/70" />
               </div>
             </div>
             <div className="flex flex-col flex-1">
-              <label className={labelClass}>End Date</label>
+              <label className={labelClass}>{t('reports.endDate', 'End Date')}</label>
               <div className="relative mt-2">
                 <input 
                   type="text" 
                   value="30 Jan 2026" 
                   readOnly
-                  className="w-full h-[52px] md:h-[56px] px-4 pl-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-default"
+                  className="w-full h-[52px] md:h-[56px] px-4 ltr:pl-12 rtl:pr-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-default ltr:text-left rtl:text-right"
                 />
-                <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70" />
+                <Calendar size={14} className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-white/70" />
               </div>
             </div>
           </div>
@@ -176,7 +178,7 @@ const ReportsFilterForm = () => {
               onClick={handleReset}
               className="text-white text-[16px] font-semibold hover:text-[#19D9F3] transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button 
               className="px-6 md:px-10 h-[48px] md:h-[44px] text-white text-[14px] md:text-[15px] font-bold tracking-wide flex items-center justify-center gap-1 transition-transform hover:scale-[1.02] active:scale-[0.98]"
@@ -186,8 +188,8 @@ const ReportsFilterForm = () => {
                 boxShadow: '0 0 70px 0 rgba(0, 159, 172, 0.40), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset'
               }}
             >
-              Download Report
-              <ChevronRight size={18} strokeWidth={2.5} />
+              {t('reports.downloadReport', 'Download Report')}
+              <ChevronRight size={18} strokeWidth={2.5} className="rtl:rotate-180" />
             </button>
           </div>
         </div>

@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, ChevronRight } from 'lucide-react';
 import AuthCard from '../components/AuthCard';
 import FormInput from '../components/FormInput';
 
 const SignIn = () => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   return (
     <AuthCard 
-      title="Welcome Back, Bhavani!" 
-      subtitle="Welcome back! Please enter your details."
+      title={t('auth.welcomeBack')} 
+      subtitle={t('auth.welcomeSubtitle')}
     >
       <form className="w-full flex flex-col gap-3 sm:gap-5" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }}>
         <FormInput 
-          label="Email" 
+          label={t('auth.email')} 
           type="email" 
           placeholder="admin@fea.gov.ae" 
         />
         
         <FormInput 
-          label="Password" 
+          label={t('auth.password')} 
           type={showPassword ? "text" : "password"} 
           placeholder="••••••••••••"
           rightIcon={showPassword ? Eye : EyeOff}
@@ -33,10 +35,10 @@ const SignIn = () => {
             <div className="w-[14px] h-[14px] rounded-[3px] border border-[#009FAC] flex items-center justify-center bg-transparent group-hover:border-[#19D9F3] transition-colors relative">
                <input type="checkbox" className="opacity-0 absolute w-full h-full cursor-pointer" />
             </div>
-            <span className="text-xs font-medium text-white tracking-wide">Remember me</span>
+            <span className="text-xs font-medium text-white tracking-wide">{t('auth.rememberMe')}</span>
           </label>
           <Link to="/forgot-password" className="text-xs font-bold text-white hover:underline hover:text-[#19D9F3] transition-colors tracking-wide underline underline-offset-2">
-            Forgot password?
+            {t('auth.forgotPassword')}
           </Link>
         </div>
 
@@ -49,12 +51,12 @@ const SignIn = () => {
             boxShadow: '0 0 70px 0 rgba(0, 159, 172, 0.40), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset'
           }}
         >
-          Login
-          <ChevronRight size={18} strokeWidth={2.5} />
+          {t('auth.login')}
+          <ChevronRight size={18} strokeWidth={2.5} className="rtl:rotate-180" />
         </button>
 
         <p className="text-center text-[11px] sm:text-xs text-white font-medium tracking-wide mt-1 sm:mt-2">
-          Don't have an account? <Link to="/signup" className="text-[#19D9F3] font-bold tracking-wide hover:underline">Sign up</Link>
+          {t('auth.noAccount')} <Link to="/signup" className="text-[#19D9F3] font-bold tracking-wide hover:underline">{t('auth.signUp')}</Link>
         </p>
       </form>
     </AuthCard>

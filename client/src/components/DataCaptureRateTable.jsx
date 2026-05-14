@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const captureRateData = [
   {
@@ -69,6 +70,7 @@ const captureRateData = [
 ];
 
 const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate' }) => {
+  const { t } = useTranslation();
   const isValidMode = activeTab === 'Valid Data Capture Rate';
 
   return (
@@ -90,7 +92,7 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
             {/* Header: Station */}
             <div className="pb-3 border-b border-white/10">
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">Station</span>
+                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.station')}</span>
                 <span className="text-[18px] font-bold text-white">{row.station}</span>
               </div>
             </div>
@@ -98,43 +100,43 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
             {/* Parameter Grid (Conductivity to Algae) */}
             <div className="grid grid-cols-2 gap-y-3 gap-x-4">
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Conductivity</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.specificConductivity')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.conductivity}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Water Temp</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.waterTemperature')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.temp}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Salinity</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.salinity')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.salinity}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Chlorophyll</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.chlorophyll')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.chlorophyll}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Oxygen Sat</span>
+                <span className="text-[11px] font-medium text-white/60">{t('analytics.oxygenSaturation')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.oxygenSat}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Dissolved Oxygen</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.dissolvedOxygen')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.dissolvedOxygen}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Turbidity</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.turbidity')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.turbidity}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">pH</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.ph')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.ph}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Depth</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.depth')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.depth}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-white/60">Blue Green Algae</span>
+                <span className="text-[11px] font-medium text-white/60">{t('dashboard.blueGreenAlgae')}</span>
                 <span className="text-[14px] font-bold text-white/90">{row.algae}</span>
               </div>
             </div>
@@ -142,15 +144,15 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
             {/* Performance Metrics Section */}
             <div className="mt-2 pt-3 border-t border-white/10 grid grid-cols-2 gap-4">
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/70">Expected Records</span>
+                <span className="text-[12px] font-medium text-white/70">{t('analytics.expectedRecords')}</span>
                 <span className="text-[16px] font-bold text-white">{row.expected}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/70">{isValidMode ? 'Valid Records' : 'Received Records'}</span>
+                <span className="text-[12px] font-medium text-white/70">{isValidMode ? t('analytics.validRecords') : t('analytics.receivedRecords')}</span>
                 <span className="text-[16px] font-bold text-white">{row.received}</span>
               </div>
               <div className="col-span-2 flex flex-col pt-1">
-                <span className="text-[12px] font-medium text-white/70">{isValidMode ? 'Valid Data Capture Rate' : 'Data Capture Rate'}</span>
+                <span className="text-[12px] font-medium text-white/70">{isValidMode ? t('analytics.validDataCaptureRate') : t('analytics.dataCaptureRate')}</span>
                 <span className="text-[20px] font-bold text-[#1DCDDD]">{row.rate}%</span>
               </div>
             </div>
@@ -165,7 +167,7 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
           {/* 1. Left Fixed Column */}
           <div className="flex-shrink-0 flex flex-col border-r border-white/10 w-[180px]">
             <div className="px-6 py-3 text-white text-[14px] font-bold border-b border-white/10 flex items-center gap-2 h-[50px] leading-tight sticky top-0 z-10 bg-transparent">
-              Station Name <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
+              {t('analytics.stationName')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
             </div>
             <div className="flex-1">
               {captureRateData.map((row, index) => (
@@ -177,30 +179,42 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
           </div>
 
           {/* 2. Middle Scrollable Columns - Table Auto for dynamic width */}
-          <div className="flex-1 overflow-x-auto scrollbar-hide flex flex-col min-w-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="flex-1 overflow-x-auto custom-scrollbar flex flex-col min-w-0">
             <style dangerouslySetInnerHTML={{__html: `
-              .scrollbar-hide::-webkit-scrollbar {
-                display: none;
+              .custom-scrollbar::-webkit-scrollbar {
+                height: 6px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 10px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(29, 205, 221, 0.2);
+                border-radius: 10px;
+                transition: all 0.3s ease;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(29, 205, 221, 0.4);
               }
             `}} />
             <table className="w-full border-collapse table-auto">
               <thead>
                 <tr className="border-b border-white/10 h-[50px]">
                   {[
-                    'Specific Conductivity',
-                    'Water Temperature',
-                    'Salinity',
-                    'Chlorophyll',
-                    'Oxygen Saturation',
-                    'Dissolved Oxygen',
-                    'Turbidity',
-                    'pH',
-                    'Depth',
-                    'Blue Green Algae',
-                    'Expected Records',
-                    isValidMode ? 'Valid Records' : 'Received Records'
+                    t('dashboard.specificConductivity'),
+                    t('dashboard.waterTemperature'),
+                    t('dashboard.salinity'),
+                    t('dashboard.chlorophyll'),
+                    t('analytics.oxygenSaturation'),
+                    t('dashboard.dissolvedOxygen'),
+                    t('dashboard.turbidity'),
+                    t('dashboard.ph'),
+                    t('dashboard.depth'),
+                    t('dashboard.blueGreenAlgae'),
+                    t('analytics.expectedRecords'),
+                    isValidMode ? t('analytics.validRecords') : t('analytics.receivedRecords')
                   ].map((label, idx) => (
-                    <th key={idx} className="px-6 py-3 text-white text-[14px] font-bold text-left whitespace-nowrap leading-tight sticky top-0 z-10 bg-transparent">
+                    <th key={idx} className="px-6 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 z-10 bg-transparent">
                       <div className="flex items-center gap-2">
                         {label} <ArrowUpDown size={14} className="flex-shrink-0 text-white/60" />
                       </div>
@@ -232,7 +246,7 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
           {/* 3. Right Fixed Column */}
           <div className="flex-shrink-0 flex flex-col border-l border-white/10 w-[180px]">
             <div className="px-6 py-3 text-white text-[14px] font-bold border-b border-white/10 flex items-center gap-2 h-[50px] leading-tight sticky top-0 z-10 bg-transparent">
-              {isValidMode ? 'Valid Data Capture Rate' : 'Data Capture Rate'} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
+              {isValidMode ? t('analytics.validDataCaptureRate') : t('analytics.dataCaptureRate')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
             </div>
             <div className="flex-1">
               {captureRateData.map((row, index) => (
@@ -257,7 +271,7 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
             color: '#FFFFFF'
           }}
         >
-          <span className="text-xl">‹</span>
+          <ChevronLeft size={18} className="rtl:rotate-180" />
         </button>
         {[1, 2, 3, 4, 5].map((page) => (
           <button
@@ -293,7 +307,7 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
             color: '#FFFFFF'
           }}
         >
-          <span className="text-xl">›</span>
+          <ChevronRight size={18} className="rtl:rotate-180" />
         </button>
       </div>
     </div>

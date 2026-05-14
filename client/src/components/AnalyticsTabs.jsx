@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const tabs = [
   'Buoys Analytics',
@@ -8,62 +9,77 @@ const tabs = [
 ];
 
 const AnalyticsTabs = ({ activeTab = 'Buoys Analytics', onTabChange, isMobile = false }) => {
+  const { t } = useTranslation();
+  
+  const tabKeyMap = {
+    'Buoys Analytics': 'analytics.buoysAnalytics',
+    'Sensor Data': 'analytics.sensorData',
+    'Data Capture Rate': 'analytics.dataCaptureRate',
+    'Valid Data Capture Rate': 'analytics.validDataCaptureRate'
+  };
+
   return (
-    <div 
-      className={`flex gap-3 w-full ${isMobile ? 'no-scrollbar' : ''}`}
-      style={isMobile ? {
-        display: 'flex',
-        flexWrap: 'nowrap',
-        overflowX: 'auto',
-        overflowY: 'hidden',
-        whiteSpace: 'nowrap',
-        gap: '12px',
-        paddingBottom: '8px',
-        scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch'
-      } : {}}
-    >
+    <div className="w-full lg:w-auto">
       <style>{`
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
+        .subtle-scrollbar::-webkit-scrollbar {
+          height: 4px;
+        }
+        .subtle-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 2px;
+        }
+        .subtle-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(0, 159, 172, 0.3);
+          border-radius: 2px;
+        }
+        .subtle-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 159, 172, 0.5);
+        }
+        .subtle-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(0, 159, 172, 0.3) rgba(255, 255, 255, 0.05);
         }
       `}</style>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab;
-        return (
-          <button
-            key={tab}
-            onClick={() => onTabChange?.(tab)}
-            className={`px-6 py-2.5 text-xs transition-all duration-300 whitespace-nowrap`}
-            style={
-              isActive
-                ? {
-                    borderRadius: '20px',
-                    border: '1px solid #009FAC',
-                    background: '#BBE6E9',
-                    boxShadow: '0 4px 24px 0 rgba(0, 159, 172, 0.50) inset',
-                    backdropFilter: 'blur(12px)',
-                    color: '#000000',
-                    fontWeight: '600',
-                    flex: isMobile ? '0 0 auto' : 'none',
-                    minWidth: isMobile ? 'max-content' : 'auto'
-                  }
-                : {
-                    borderRadius: '24px',
-                    border: '1px solid rgba(255, 255, 255, 0.30)',
-                    background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
-                    boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
-                    color: '#FFFFFF',
-                    fontWeight: '400',
-                    flex: isMobile ? '0 0 auto' : 'none',
-                    minWidth: isMobile ? 'max-content' : 'auto'
-                  }
-            }
-          >
-            {tab}
-          </button>
-        );
-      })}
+      <div 
+        className={`flex gap-3 w-full overflow-x-auto subtle-scrollbar flex-nowrap`}
+        style={{
+          paddingBottom: '8px',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => onTabChange?.(tab)}
+              className={`px-6 py-2.5 text-xs transition-all duration-300 whitespace-nowrap text-center flex-1 min-w-max`}
+              style={
+                isActive
+                  ? {
+                      borderRadius: '20px',
+                      border: '1px solid #009FAC',
+                      background: '#BBE6E9',
+                      boxShadow: '0 4px 24px 0 rgba(0, 159, 172, 0.50) inset',
+                      backdropFilter: 'blur(12px)',
+                      color: '#000000',
+                      fontWeight: '600',
+                    }
+                  : {
+                      borderRadius: '24px',
+                      border: '1px solid rgba(255, 255, 255, 0.30)',
+                      background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                      boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
+                      color: '#FFFFFF',
+                      fontWeight: '400',
+                    }
+              }
+            >
+              {tabKeyMap[tab] ? t(tabKeyMap[tab]) : tab}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import LanguageSelector from './LanguageSelector';
 import heroBg from '../assets/hero-bg.png';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-auth.png';
 
 const AuthLayout = () => {
   return (
@@ -18,20 +18,20 @@ const AuthLayout = () => {
         {/* ── Mobile top bar: centred, constrained to card width ── */}
         <div className="flex md:hidden w-full justify-center pt-5 pb-4 flex-shrink-0">
           <div className="w-[90%] max-w-[520px] flex justify-between items-center">
-            <img src={logo} alt="Fujairah Environment Authority" className="h-10 w-auto object-contain" />
+            <img src={logo} alt="Fujairah Environment Authority" className="h-10 w-auto object-contain" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.6))' }} />
             <LanguageSelector />
           </div>
         </div>
 
         {/* ── Tablet top bar: full-width, logo left / language right ── */}
         <div className="hidden md:flex lg:hidden w-full px-8 pt-6 pb-5 justify-between items-center flex-shrink-0">
-          <img src={logo} alt="Fujairah Environment Authority" className="h-12 w-auto object-contain" />
+          <img src={logo} alt="Fujairah Environment Authority" className="h-12 w-auto object-contain" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.6))' }} />
           <LanguageSelector />
         </div>
 
         {/* ── Desktop top bar: inside panel, logo left / language right ── */}
         <div className="hidden lg:flex w-full px-8 pt-8 pb-5 justify-between items-center flex-shrink-0">
-          <img src={logo} alt="Fujairah Environment Authority" className="h-12 w-auto object-contain" />
+          <img src={logo} alt="Fujairah Environment Authority" className="h-12 w-auto object-contain" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.6))' }} />
           <LanguageSelector />
         </div>
 

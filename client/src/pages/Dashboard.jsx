@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import DashboardHeader from '../components/DashboardHeader';
 import MetricsGrid from '../components/MetricsGrid';
@@ -9,14 +9,27 @@ import MobileHeader from '../components/MobileHeader';
 import MobileSidebar from '../components/MobileSidebar';
 
 import { motion } from 'framer-motion';
+import { ChevronUp, ChevronDown } from 'lucide-react';
+
+const stations = [
+  { id: 1, name: 'AL Aqah Buoy', position: [25.4725, 56.4162], temp: '25.1', color: 'orange', updated: '2 min ago', interval: '30 min' },
+  { id: 2, name: 'Fujairah Buoy 1', position: [25.1288, 56.3572], temp: '24.9', color: 'yellow', updated: '5 min ago', interval: '30 min' },
+  { id: 3, name: 'Fujairah Buoy 2', position: [25.2041, 56.3738], temp: '25.3', color: 'cyan', updated: '1 min ago', interval: '30 min' },
+  { id: 4, name: 'Coastal Buoy A', position: [25.3100, 56.3950], temp: '24.8', color: 'pink', updated: '8 min ago', interval: '30 min' },
+];
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Sonde');
-  const [selectedBuoy, setSelectedBuoy] = useState(null);
+  const [selectedBuoy, setSelectedBuoy] = useState(stations[0]);
+  const [selectedMetric, setSelectedMetric] = useState(activeTab === 'Sonde' ? 'Water Temperature (°c)' : 'Air Temperature (°c)');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Mobile Bottom Sheet State (Framer Motion)
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
+
+  useEffect(() => {
+    setSelectedMetric(activeTab === 'Sonde' ? 'Water Temperature (°c)' : 'Air Temperature (°c)');
+  }, [activeTab]);
 
   const handleDragEnd = (_, info) => {
     // Negative offset means dragging up
@@ -50,7 +63,7 @@ const Dashboard = () => {
 
           {/* Fixed Map Section (Background) */}
           <div className="fixed top-[64px] left-0 right-0 bottom-0 z-0">
-            <MapView onBuoySelect={setSelectedBuoy} isMobile={true} />
+            <MapView onBuoySelect={setSelectedBuoy} selectedBuoy={selectedBuoy} isMobile={true} />
           </div>
 
           {/* Draggable Bottom Sheet */}
@@ -80,32 +93,41 @@ const Dashboard = () => {
             }}
           >
             {/* Drag Handle Area */}
-            <div className="w-full flex justify-center pt-3 pb-5 sticky top-0 z-[60] bg-transparent">
-              <div 
-                className="w-10 h-[5px] rounded-full bg-black/30 opacity-50 transition-opacity"
-                style={{ cursor: 'grab' }}
-              />
+            <div className="w-full flex justify-center pt-3 pb-0 sticky top-0 z-[60] bg-transparent">
+              <div style={{ cursor: 'grab' }} className="text-black/40 transition-opacity">
+                {isBottomSheetExpanded ? <ChevronDown size={24} strokeWidth={2.5} /> : <ChevronUp size={24} strokeWidth={2.5} />}
+              </div>
             </div>
 
             <div 
-              className="p-4 flex flex-col gap-6 pb-20 max-w-2xl mx-auto"
+              className="pt-2 px-4 flex flex-col gap-6 pb-20 max-w-2xl mx-auto"
               style={{ touchAction: isBottomSheetExpanded ? 'auto' : 'none' }}
             >
               {/* Summary Card */}
-              <BuoyStatusCard activeTab={activeTab} isMobile={true} />
+              <BuoyStatusCard activeTab={activeTab} selectedBuoy={selectedBuoy} isMobile={true} />
 
               {/* Dashboard Content Container */}
-              <div className="flex flex-col gap-6">
-                <div className="text-center">
-                  <DashboardHeader activeTab={activeTab} setActiveTab={setActiveTab} isMobile={true} />
-                </div>
+                <div className="flex flex-col gap-6">
+                  <div className="text-center">
+                    <DashboardHeader activeTab={activeTab} setActiveTab={setActiveTab} isMobile={true} />
+                  </div>
 
-                <MetricsGrid activeTab={activeTab} isMobile={true} />
-                
-                <div className="w-full h-[200px] mb-4">
-                  <TemperatureChart activeTab={activeTab} isMobile={true} />
+                  <div className="w-full h-[200px] mb-4">
+                    <TemperatureChart 
+                      activeTab={activeTab} 
+                      selectedBuoy={selectedBuoy} 
+                      selectedMetric={selectedMetric} 
+                      isMobile={true} 
+                    />
+                  </div>
+
+                  <MetricsGrid 
+                    activeTab={activeTab} 
+                    selectedMetric={selectedMetric} 
+                    setSelectedMetric={setSelectedMetric} 
+                    isMobile={true} 
+                  />
                 </div>
-              </div>
             </div>
           </motion.div>
         </div>
@@ -114,7 +136,7 @@ const Dashboard = () => {
         <div className="hidden lg:block w-full h-full relative">
           {/* MapContainer */}
           <div className="w-full h-full rounded-[28px] overflow-hidden relative">
-            <MapView onBuoySelect={setSelectedBuoy} />
+            <MapView onBuoySelect={setSelectedBuoy} selectedBuoy={selectedBuoy} />
           </div>
 
           {/* Dashboard Overlay Container (Layout Wrapper) */}
@@ -124,7 +146,7 @@ const Dashboard = () => {
           >
             {/* Summary Buoy Card (Left Section - Tall) */}
             <div className="w-[340px] flex-shrink-0 flex items-end relative h-full">
-              <BuoyStatusCard activeTab={activeTab} />
+              <BuoyStatusCard activeTab={activeTab} selectedBuoy={selectedBuoy} />
             </div>
 
             {/* Dashboard Content Section (Right Section - Shorter Glass Panel) */}
@@ -146,12 +168,20 @@ const Dashboard = () => {
               <div className="flex gap-[20px] items-stretch flex-1 min-h-0 pt-2">
                 {/* Metrics Grid */}
                 <div className="w-[52%] h-full">
-                  <MetricsGrid activeTab={activeTab} />
+                  <MetricsGrid 
+                    activeTab={activeTab} 
+                    selectedMetric={selectedMetric} 
+                    setSelectedMetric={setSelectedMetric} 
+                  />
                 </div>
 
                 {/* Chart Panel */}
                 <div className="flex-1 h-full min-w-0">
-                  <TemperatureChart activeTab={activeTab} />
+                  <TemperatureChart 
+                    activeTab={activeTab} 
+                    selectedBuoy={selectedBuoy} 
+                    selectedMetric={selectedMetric} 
+                  />
                 </div>
               </div>
             </div>

@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, MapPin, Filter, X, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const AnalyticsFilters = ({ isMobile = false }) => {
+  const { t } = useTranslation();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterPos, setFilterPos] = useState({ top: 0, left: 0 });
   const filterBtnRef = useRef(null);
@@ -64,44 +66,73 @@ const AnalyticsFilters = ({ isMobile = false }) => {
   };
 
   return (
-    <div className={`grid grid-cols-2 lg:flex lg:flex-row items-center gap-3 w-full lg:w-auto`}>
-      {/* Date Picker 1 */}
-      <div 
-        className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs transition-all cursor-pointer w-full lg:w-auto justify-center lg:justify-start"
-        style={filterStyle}
-      >
-        <Calendar size={14} className="text-white/70" />
-        <span className="whitespace-nowrap">09-02-2025</span>
-      </div>
+    <div className={`w-full lg:w-auto`}>
+      {isMobile ? (
+        <div className="flex flex-row items-center gap-2 w-full">
+          <div 
+            className="flex-1 flex items-center justify-center px-3 py-2 text-[11px] md:text-xs transition-all cursor-pointer"
+            style={filterStyle}
+          >
+            <Calendar size={14} className="text-white/70" />
+          </div>
+          <button 
+            ref={filterBtnRef}
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="flex-1 flex items-center justify-center px-3 py-2 text-[11px] md:text-xs font-bold transition-all hover:brightness-110 active:scale-95"
+            style={filterStyle}
+          >
+            <Filter size={14} className="text-white/70" />
+          </button>
+          <div 
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-[11px] md:text-xs transition-all cursor-pointer"
+            style={filterStyle}
+          >
+            <MapPin size={14} className="text-white/70" />
+            <span className="whitespace-nowrap">Al Aqah New</span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-row items-center gap-2">
+          {/* Date Picker 1 */}
+          <div 
+            className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs transition-all cursor-pointer justify-center"
+            style={filterStyle}
+          >
+            <Calendar size={14} className="text-white/70" />
+            <span className="whitespace-nowrap">09-02-2025</span>
+          </div>
 
-      {/* Date Picker 2 */}
-      <div 
-        className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs transition-all cursor-pointer w-full lg:w-auto justify-center lg:justify-start"
-        style={filterStyle}
-      >
-        <Calendar size={14} className="text-white/70" />
-        <span className="whitespace-nowrap">09-02-2026</span>
-      </div>
+          {/* Date Picker 2 */}
+          <div 
+            className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs transition-all cursor-pointer justify-center"
+            style={filterStyle}
+          >
+            <Calendar size={14} className="text-white/70" />
+            <span className="whitespace-nowrap">09-02-2026</span>
+          </div>
 
-      {/* Location Dropdown */}
-      <div 
-        className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs transition-all cursor-pointer w-full lg:w-auto justify-center lg:justify-start"
-        style={filterStyle}
-      >
-        <MapPin size={14} className="text-white/70" />
-        <span className="whitespace-nowrap">Al Aqah New</span>
-      </div>
+          {/* Location Dropdown */}
+          <div 
+            className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs transition-all cursor-pointer justify-center"
+            style={filterStyle}
+          >
+            <MapPin size={14} className="text-white/70" />
+            <span className="whitespace-nowrap">Al Aqah New</span>
+            <ChevronDown size={14} className="text-white/70" />
+          </div>
 
-      {/* Filter Button */}
-      <button 
-        ref={filterBtnRef}
-        onClick={() => setIsFilterOpen(!isFilterOpen)}
-        className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs font-bold transition-all hover:brightness-110 active:scale-95 w-full lg:w-auto justify-center lg:justify-start"
-        style={filterStyle}
-      >
-        <Filter size={14} className="text-white/70" />
-        Filter
-      </button>
+          {/* Filter Button */}
+          <button 
+            ref={filterBtnRef}
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="flex items-center gap-2 px-4 py-2 text-[11px] md:text-xs font-bold transition-all hover:brightness-110 active:scale-95 justify-center"
+            style={filterStyle}
+          >
+            <Filter size={14} className="text-white/70" />
+            <span className="whitespace-nowrap">Filter</span>
+          </button>
+        </div>
+      )}
 
       {/* Filter Menu via Portal */}
       {isFilterOpen && createPortal(
@@ -121,14 +152,14 @@ const AnalyticsFilters = ({ isMobile = false }) => {
         >
           {/* Parameters */}
           <div className="flex flex-col">
-            <label className={labelClass}>Parameters</label>
+            <label className={labelClass}>{t('analytics.parameters')}</label>
             <div className={selectBoxClass}>
               <div className="flex flex-wrap gap-2">
                 <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-[13px]">
-                  Bluegreen Algae <X size={14} className="cursor-pointer" />
+                  {t('analytics.blueGreenAlgae')} <X size={14} className="cursor-pointer" />
                 </span>
                 <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-[13px]">
-                  Water Temperature <X size={14} className="cursor-pointer" />
+                  {t('analytics.waterTemperature')} <X size={14} className="cursor-pointer" />
                 </span>
               </div>
               <ChevronDown size={14} className="text-white/70" />
@@ -137,7 +168,7 @@ const AnalyticsFilters = ({ isMobile = false }) => {
 
           {/* Duration */}
           <div className="flex flex-col">
-            <label className={labelClass}>Duration</label>
+            <label className={labelClass}>{t('analytics.duration')}</label>
             <div className={selectBoxClass}>
               <span>Monthly</span>
               <ChevronDown size={14} className="text-white/70" />
@@ -171,7 +202,7 @@ const AnalyticsFilters = ({ isMobile = false }) => {
               onClick={() => setIsFilterOpen(false)}
               className="text-white text-[16px] font-semibold hover:text-[#19D9F3] transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button 
               className="w-full sm:w-auto px-10 h-[44px] text-white text-[15px] font-bold tracking-wide flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
@@ -181,7 +212,7 @@ const AnalyticsFilters = ({ isMobile = false }) => {
                 boxShadow: '0 0 40px 0 rgba(0, 159, 172, 0.30), 0 0 1px 4px rgba(255, 255, 255, 0.10)'
               }}
             >
-              Apply Filters
+              {t('common.filter')}
             </button>
           </div>
         </div>,

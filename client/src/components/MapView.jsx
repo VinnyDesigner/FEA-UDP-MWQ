@@ -30,9 +30,6 @@ const createBuoyIcon = (temp, colorKey, isActive) => {
     html: `
       <div style="position:relative; width:80px; height:80px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; pointer-events:none;">
         
-        <!-- Waves glow (Categorical color) -->
-        <div style="position:absolute; bottom:0px; left:50%; transform:translateX(-50%); width:65px; height:14px; background:${color.main}${isActive ? '88' : '55'}; filter:blur(3px); border-radius:50%; z-index:0;"></div>
-        
         <!-- Buoy Body (Using high-fidelity PNG) -->
         <div style="position:relative; z-index:5; width:55px; height:55px; pointer-events:auto;">
           <img 
@@ -41,7 +38,7 @@ const createBuoyIcon = (temp, colorKey, isActive) => {
               width:100%; 
               height:100%; 
               object-fit:contain; 
-              filter: ${isActive ? color.filter : 'none'} drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+              filter: ${isActive ? color.filter : 'none'};
               transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             " 
           />
@@ -64,18 +61,7 @@ const createBuoyIcon = (temp, colorKey, isActive) => {
           </div>
         </div>
         
-        ${isActive ? `
-          <!-- Active Pulsing Indicator -->
-          <div style="position:absolute; bottom:-12px; width:55px; height:10px; background:${color.main}; border-radius:50%; opacity:0.4; filter:blur(2px); animation: pulse 2.5s infinite;"></div>
-        ` : ''}
       </div>
-      <style>
-        @keyframes pulse {
-          0% { transform: scale(0.85) translateX(-58%); opacity: 0.5; }
-          50% { transform: scale(1.15) translateX(-43%); opacity: 0.2; }
-          100% { transform: scale(0.85) translateX(-58%); opacity: 0.5; }
-        }
-      </style>
     `,
     iconSize: [80, 80],
     iconAnchor: [40, 75],
@@ -98,14 +84,14 @@ const MapController = forwardRef((_, ref) => {
   return null;
 });
 
-const MapView = forwardRef(({ onBuoySelect, isMobile = false }, ref) => {
+const MapView = forwardRef(({ onBuoySelect, selectedBuoy, isMobile = false }, ref) => {
   const controlRef = useRef();
-  const [activeBuoyId, setActiveBuoyId] = useState(1);
 
   const handleMarkerClick = (b) => {
-    setActiveBuoyId(b.id);
     if (onBuoySelect) onBuoySelect(b);
   };
+
+  const activeId = selectedBuoy ? selectedBuoy.id : 1;
 
   return (
     <div className={`${isMobile ? 'relative w-full h-full' : 'absolute inset-0'} z-0`}>
@@ -124,16 +110,16 @@ const MapView = forwardRef(({ onBuoySelect, isMobile = false }, ref) => {
         <MapController ref={controlRef} />
         {buoys.map((b) => (
           <Marker
-            key={`${b.id}-${activeBuoyId === b.id ? 'active' : 'inactive'}`}
+            key={`${b.id}-${activeId === b.id ? 'active' : 'inactive'}`}
             position={b.position}
-            icon={createBuoyIcon(b.temp, b.color, activeBuoyId === b.id)}
+            icon={createBuoyIcon(b.temp, b.color, activeId === b.id)}
             eventHandlers={{ click: () => handleMarkerClick(b) }}
           />
         ))}
       </MapContainer>
 
       {/* Map zoom controls */}
-      <div className={`absolute ${isMobile ? 'top-4 right-4' : 'top-8 right-8'} flex flex-col gap-2 z-[1000]`}>
+      <div className={`absolute ${isMobile ? 'top-4 right-4 rtl:right-auto rtl:left-4' : 'top-8 right-8 rtl:right-auto rtl:left-8'} flex flex-col gap-2 z-[1000]`}>
         <button
           onClick={() => controlRef.current?.zoomIn()}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-90 active:scale-95"

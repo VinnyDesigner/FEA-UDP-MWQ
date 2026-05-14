@@ -2,16 +2,19 @@ import React from 'react';
 import { LogOut, User } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useNavigate, NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 
 const navItems = [
-  { icon: '/assets/nav/home.png', label: 'Dashboard', path: '/dashboard' },
-  { icon: '/assets/nav/analytics.png', label: 'MIS Analytics', path: '/mis-analytics' },
-  { icon: '/assets/nav/reports.png', label: 'Reports', path: '/reports' },
-  { icon: '/assets/nav/help.png', label: 'Frequently Asked Questions', path: '/faq' },
+  { icon: '/assets/nav/home.png', labelKey: 'nav.dashboard', path: '/dashboard' },
+  { icon: '/assets/nav/analytics.png', labelKey: 'nav.misAnalytics', path: '/mis-analytics' },
+  { icon: '/assets/nav/reports.png', labelKey: 'nav.reports', path: '/reports' },
+  { icon: '/assets/nav/help.png', labelKey: 'nav.faq', path: '/faq' },
 ];
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <aside className="hidden md:flex w-[72px] min-w-[72px] max-w-[72px] h-full flex-col items-center py-6 justify-between flex-shrink-0 z-[1100] pointer-events-auto">
@@ -35,11 +38,11 @@ const Sidebar = () => {
           width: '54px',
         }}
       >
-        {navItems.map(({ icon: IconSrc, label, path }) => (
+        {navItems.map(({ icon: IconSrc, labelKey, path }) => (
           <NavLink
-            key={label}
+            key={labelKey}
             to={path}
-            title={label}
+            title={t(labelKey)}
             className={({ isActive }) => `flex items-center justify-center transition-all w-[38px] h-[38px]`}
             style={({ isActive }) => isActive ? {
               borderRadius: '50px',
@@ -52,7 +55,7 @@ const Sidebar = () => {
             {({ isActive }) => (
               <img 
                 src={IconSrc} 
-                alt={label} 
+                alt={t(labelKey)} 
                 className="w-5 h-5 object-contain transition-opacity duration-300" 
                 style={{ opacity: isActive ? 1 : 0.6 }}
               />
@@ -73,16 +76,9 @@ const Sidebar = () => {
           width: '54px',
         }}
       >
+        <LanguageSelector isIconOnly={true} />
         <button
-          title="Logout"
-          onClick={() => navigate('/signin')}
-          className="flex items-center justify-center transition-all hover:opacity-80"
-          style={{ width: '36px', height: '36px' }}
-        >
-          <LogOut size={18} color="rgba(255,255,255,0.8)" strokeWidth={2} />
-        </button>
-        <button
-          title="User Profile"
+          title={t('nav.userProfile')}
           className="flex items-center justify-center transition-all hover:opacity-80"
           style={{ width: '38px', height: '38px' }}
         >
@@ -99,7 +95,16 @@ const Sidebar = () => {
              <User size={18} color="#ffffff" strokeWidth={2.5} />
           </div>
         </button>
+        <button
+          title={t('nav.logout')}
+          onClick={() => navigate('/signin')}
+          className="flex items-center justify-center transition-all hover:opacity-80"
+          style={{ width: '36px', height: '36px' }}
+        >
+          <LogOut size={18} color="rgba(255,255,255,0.8)" strokeWidth={2} className="rtl:rotate-180" />
+        </button>
       </div>
+
 
     </aside>
   );

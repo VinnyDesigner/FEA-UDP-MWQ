@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpDown, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const tableData = [
   { station: 'Al Aqah New', parameter: 'Blue Green Algae', min: '2634', max: '5831', duration: 'February - 2025' },
@@ -9,6 +10,7 @@ const tableData = [
 ];
 
 const AnalyticsTable = ({ isMobile = false }) => {
+  const { t } = useTranslation();
   const gridTemplate = "grid grid-cols-[1.3fr_1.8fr_1.3fr_1.3fr_1.6fr_1fr] items-center w-full";
 
   return (
@@ -29,24 +31,24 @@ const AnalyticsTable = ({ isMobile = false }) => {
           >
             {/* Station */}
             <div className="flex flex-col gap-1">
-              <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">Station</span>
+              <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">{t('analytics.station')}</span>
               <span className="text-[18px] font-bold text-white">{row.station}</span>
             </div>
 
             {/* Parameter */}
             <div className="flex flex-col gap-1">
-              <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">Parameter</span>
+              <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">{t('analytics.parameters')}</span>
               <span className="text-[16px] font-semibold text-white/90">{row.parameter}</span>
             </div>
 
             {/* Min/Max Values Grid */}
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-white/5">
               <div className="flex flex-col gap-1">
-                <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">Min Value</span>
+                <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">{t('analytics.minValue')}</span>
                 <span className="text-[18px] font-bold text-[#1DCDDD]">{row.min}</span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">Max Value</span>
+                <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">{t('analytics.maxValue')}</span>
                 <span className="text-[18px] font-bold text-[#1DCDDD]">{row.max}</span>
               </div>
             </div>
@@ -54,12 +56,12 @@ const AnalyticsTable = ({ isMobile = false }) => {
             {/* Duration & Details Row */}
             <div className="flex items-center justify-between pt-2 border-t border-white/5">
               <div className="flex flex-col gap-1">
-                <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">Duration</span>
+                <span className="text-[13px] font-medium text-white/70 uppercase tracking-wide">{t('analytics.duration')}</span>
                 <span className="text-[14px] font-medium text-white/60 italic">{row.duration}</span>
               </div>
               <button className="flex items-center gap-1 text-[#1DCDDD] font-bold text-[15px] hover:text-white transition-colors">
-                Show More
-                <ChevronRight size={18} />
+                {t('analytics.details')}
+                <ChevronRight size={18} className="rtl:rotate-180" />
               </button>
             </div>
           </div>
@@ -71,23 +73,23 @@ const AnalyticsTable = ({ isMobile = false }) => {
         <div className="overflow-x-auto no-scrollbar">
           <div className="min-w-[850px] lg:min-w-0 w-full flex flex-col">
             {/* Fixed Header Frame */}
-            <div className={`${gridTemplate} text-left text-white text-[14px] font-bold border-b border-white/10 px-4 py-4 sticky top-0 z-20 bg-transparent flex-shrink-0`}>
+            <div className={`${gridTemplate} text-left text-white text-[14px] font-bold border-b border-white/10 px-4 py-4 sticky top-0 z-20 bg-transparent flex-shrink-0 ltr:text-left rtl:text-right`}>
               <div className="flex items-center gap-2">
-                Station <ArrowUpDown size={16} className="text-white/60" />
+                {t('analytics.station')} <ArrowUpDown size={16} className="text-white/60" />
               </div>
               <div className="flex items-center gap-2">
-                Parameters <ArrowUpDown size={16} className="text-white/60" />
+                {t('analytics.parameters')} <ArrowUpDown size={16} className="text-white/60" />
               </div>
               <div className="flex items-center gap-2">
-                Min Value <ArrowUpDown size={16} className="text-white/60" />
+                {t('analytics.minValue')} <ArrowUpDown size={16} className="text-white/60" />
               </div>
               <div className="flex items-center gap-2">
-                Max Value <ArrowUpDown size={16} className="text-white/60" />
+                {t('analytics.maxValue')} <ArrowUpDown size={16} className="text-white/60" />
               </div>
               <div className="flex items-center gap-2">
-                Duration <ArrowUpDown size={16} className="text-white/60" />
+                {t('analytics.duration')} <ArrowUpDown size={16} className="text-white/60" />
               </div>
-              <div className="text-right">Details</div>
+              <div className="ltr:text-right rtl:text-left">{t('analytics.details')}</div>
             </div>
 
             {/* Scrollable Body Frame */}
@@ -102,9 +104,9 @@ const AnalyticsTable = ({ isMobile = false }) => {
                   <div className="text-white/90 font-bold">{row.min}</div>
                   <div className="text-white/90 font-bold">{row.max}</div>
                   <div className="text-white/60">{row.duration}</div>
-                  <div className="text-right">
+                  <div className="ltr:text-right rtl:text-left">
                     <button className="text-[#1DCDDD] hover:text-white underline underline-offset-4 decoration-1 font-semibold transition-all">
-                      Show More
+                      {t('analytics.details')}
                     </button>
                   </div>
                 </div>

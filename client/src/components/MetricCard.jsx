@@ -1,9 +1,10 @@
 import React from 'react';
 
-const MetricCard = ({ label, value, icon: Icon, isSelected, isMobile = false }) => {
+const MetricCard = ({ label, value, icon: Icon, isSelected, onClick, isMobile = false }) => {
   return (
     <div
-      className="flex flex-col justify-between"
+      onClick={onClick}
+      className="flex flex-col justify-between transition-all duration-300"
       style={{
         height: isMobile ? '84px' : '100%',
         minHeight: 'unset',
@@ -16,6 +17,7 @@ const MetricCard = ({ label, value, icon: Icon, isSelected, isMobile = false }) 
           ? '0 4px 24px 0 rgba(0, 159, 172, 0.50) inset' 
           : '0 4px 15px rgba(0,0,0,0.05)',
         backdropFilter: 'blur(12px)',
+        cursor: 'pointer'
       }}
     >
       <div className={isMobile ? 'mb-1' : 'mb-2'}>

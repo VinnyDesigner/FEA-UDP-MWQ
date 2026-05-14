@@ -3,8 +3,10 @@ import Sidebar from '../components/Sidebar';
 import MobileHeader from '../components/MobileHeader';
 import MobileSidebar from '../components/MobileSidebar';
 import ReportsFilterForm from '../components/ReportsFilterForm';
+import { useTranslation } from 'react-i18next';
 
 const ReportsPage = () => {
+  const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -33,10 +35,10 @@ const ReportsPage = () => {
           {/* Header Section */}
           <div className="flex flex-col">
             <h1 className="text-[28px] md:text-[36px] font-bold text-white tracking-tight leading-[1.2]">
-              Marine Water Quality Monitoring Dashboard - Reports
+              {t('reports.pageTitle')}
             </h1>
             <p className="text-[14px] md:text-[16px] text-gray-400 mt-3 max-w-[95%] md:max-w-[80%] leading-relaxed">
-              Comprehensive insights and trend analysis of key coastal monitoring parameters.
+              {t('reports.pageSubtitle')}
             </p>
           </div>
 
@@ -65,10 +67,10 @@ const ReportsPage = () => {
         {/* Header Section (Inside Panel) */}
         <div className="flex flex-col mb-10">
           <h1 className="text-xl font-bold text-white tracking-tight">
-            Marine Water Quality Monitoring Dashboard - Reports
+            {t('reports.pageTitle')}
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Comprehensive insights and trend analysis of key coastal monitoring parameters.
+            {t('reports.pageSubtitle')}
           </p>
         </div>
 
