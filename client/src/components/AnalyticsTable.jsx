@@ -60,7 +60,7 @@ const AnalyticsTable = ({ isMobile = false }) => {
                 <span className="text-[14px] font-medium text-white/60 italic">{row.duration}</span>
               </div>
               <button className="flex items-center gap-1 text-[#1DCDDD] font-bold text-[15px] hover:text-white transition-colors">
-                {t('analytics.details')}
+                {t('analytics.showMore')}
                 <ChevronRight size={18} className="rtl:rotate-180" />
               </button>
             </div>
@@ -89,7 +89,7 @@ const AnalyticsTable = ({ isMobile = false }) => {
               <div className="flex items-center gap-2">
                 {t('analytics.duration')} <ArrowUpDown size={16} className="text-white/60" />
               </div>
-              <div className="ltr:text-right rtl:text-left">{t('analytics.details')}</div>
+              <div className="ltr:text-right rtl:text-left">{t('analytics.showMore')}</div>
             </div>
 
             {/* Scrollable Body Frame */}
@@ -106,7 +106,7 @@ const AnalyticsTable = ({ isMobile = false }) => {
                   <div className="text-white/60">{row.duration}</div>
                   <div className="ltr:text-right rtl:text-left">
                     <button className="text-[#1DCDDD] hover:text-white underline underline-offset-4 decoration-1 font-semibold transition-all">
-                      {t('analytics.details')}
+                      {t('analytics.showMore')}
                     </button>
                   </div>
                 </div>

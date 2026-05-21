@@ -48,7 +48,9 @@
   "analytics": {
     "pageTitle": "Marine Water Quality Monitoring Dashboard - MIS Analytics",
     "pageSubtitle": "Dedicated parameter records for performance tracking and environmental analysis.",
+    "liveData": "Live Data",
     "buoysAnalytics": "Buoys Analytics",
+    "stationHealth": "Station Health",
     "sensorData": "Sensor Data",
     "dataCaptureRate": "Data Capture Rate",
     "validDataCaptureRate": "Valid Data Capture Rate",

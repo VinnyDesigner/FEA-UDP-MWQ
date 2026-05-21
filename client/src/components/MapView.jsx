@@ -80,12 +80,19 @@ const MapController = forwardRef((_, ref) => {
   useImperativeHandle(ref, () => ({
     zoomIn:  () => map.zoomIn(),
     zoomOut: () => map.zoomOut(),
+    setView: (center, zoom) => map.setView(center, zoom),
   }));
   return null;
 });
 
 const MapView = forwardRef(({ onBuoySelect, selectedBuoy, isMobile = false }, ref) => {
   const controlRef = useRef();
+
+  useImperativeHandle(ref, () => ({
+    zoomIn:  () => controlRef.current?.zoomIn(),
+    zoomOut: () => controlRef.current?.zoomOut(),
+    setView: (center, zoom) => controlRef.current?.setView(center, zoom),
+  }));
 
   const handleMarkerClick = (b) => {
     if (onBuoySelect) onBuoySelect(b);
@@ -98,7 +105,7 @@ const MapView = forwardRef(({ onBuoySelect, selectedBuoy, isMobile = false }, re
       <MapContainer
         center={[25.28, 56.34]}
         zoom={isMobile ? 10 : 11}
-        style={{ width: '100%', height: '100%', background: '#b2d9e8' }}
+        style={{ width: '100%', height: '100%', background: '#f4f3f0' }}
         zoomControl={false}
         attributionControl={false}
       >
@@ -118,29 +125,31 @@ const MapView = forwardRef(({ onBuoySelect, selectedBuoy, isMobile = false }, re
         ))}
       </MapContainer>
 
-      {/* Map zoom controls */}
-      <div className={`absolute ${isMobile ? 'top-4 right-4 rtl:right-auto rtl:left-4' : 'top-8 right-8 rtl:right-auto rtl:left-8'} flex flex-col gap-2 z-[1000]`}>
-        <button
-          onClick={() => controlRef.current?.zoomIn()}
-          className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-90 active:scale-95"
-          style={{ 
-            background: '#FFF', 
-            boxShadow: '0 4px 4px 0 rgba(0, 0, 0, 0.25) inset' 
-          }}
-        >
-          <Plus size={20} className="text-[#072227]" />
-        </button>
-        <button
-          onClick={() => controlRef.current?.zoomOut()}
-          className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-90 active:scale-95"
-          style={{ 
-            background: '#FFF', 
-            boxShadow: '0 4px 4px 0 rgba(0, 0, 0, 0.25) inset' 
-          }}
-        >
-          <Minus size={20} className="text-[#072227]" />
-        </button>
-      </div>
+      {/* Map zoom controls - mobile only */}
+      {isMobile && (
+        <div className="absolute top-4 right-4 rtl:right-auto rtl:left-4 flex flex-col gap-2 z-[1000]">
+          <button
+            onClick={() => controlRef.current?.zoomIn()}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-90 active:scale-95"
+            style={{ 
+              background: '#FFF', 
+              boxShadow: '0 4px 4px 0 rgba(0, 0, 0, 0.25) inset' 
+            }}
+          >
+            <Plus size={20} className="text-[#072227]" />
+          </button>
+          <button
+            onClick={() => controlRef.current?.zoomOut()}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-90 active:scale-95"
+            style={{ 
+              background: '#FFF', 
+              boxShadow: '0 4px 4px 0 rgba(0, 0, 0, 0.25) inset' 
+            }}
+          >
+            <Minus size={20} className="text-[#072227]" />
+          </button>
+        </div>
+      )}
     </div>
   );
 });

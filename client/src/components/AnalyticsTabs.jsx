@@ -2,20 +2,18 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const tabs = [
+  'Live Data',
   'Buoys Analytics',
-  'Sensor Data',
-  'Data Capture Rate',
-  'Valid Data Capture Rate'
+  'Station Health'
 ];
 
-const AnalyticsTabs = ({ activeTab = 'Buoys Analytics', onTabChange, isMobile = false }) => {
+const AnalyticsTabs = ({ activeTab = 'Live Data', onTabChange, isMobile = false }) => {
   const { t } = useTranslation();
   
   const tabKeyMap = {
+    'Live Data': 'analytics.liveData',
     'Buoys Analytics': 'analytics.buoysAnalytics',
-    'Sensor Data': 'analytics.sensorData',
-    'Data Capture Rate': 'analytics.dataCaptureRate',
-    'Valid Data Capture Rate': 'analytics.validDataCaptureRate'
+    'Station Health': 'analytics.stationHealth'
   };
 
   return (
@@ -41,7 +39,7 @@ const AnalyticsTabs = ({ activeTab = 'Buoys Analytics', onTabChange, isMobile = 
         }
       `}</style>
       <div 
-        className={`flex gap-3 w-full overflow-x-auto subtle-scrollbar flex-nowrap`}
+        className="flex gap-3 w-full overflow-x-auto subtle-scrollbar flex-nowrap"
         style={{
           paddingBottom: '8px',
           WebkitOverflowScrolling: 'touch'
@@ -53,7 +51,7 @@ const AnalyticsTabs = ({ activeTab = 'Buoys Analytics', onTabChange, isMobile = 
             <button
               key={tab}
               onClick={() => onTabChange?.(tab)}
-              className={`px-6 py-2.5 text-xs transition-all duration-300 whitespace-nowrap text-center flex-1 min-w-max`}
+              className="px-6 py-2.5 text-xs transition-all duration-300 whitespace-nowrap text-center flex-1 min-w-max outline-none cursor-pointer"
               style={
                 isActive
                   ? {

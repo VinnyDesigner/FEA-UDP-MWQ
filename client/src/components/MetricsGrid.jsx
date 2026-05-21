@@ -24,18 +24,34 @@ const weatherMetrics = [
   { label: 'Pressure (bar)', labelKey: 'dashboard.pressure', value: '20.5 bar', icon: '/assets/weather/pressure.png' },
 ];
 
-const MetricsGrid = ({ activeTab, selectedMetric, setSelectedMetric, isMobile = false }) => {
+const MetricsGrid = ({ activeTab, selectedMetric, setSelectedMetric, isMobile = false, selectedBuoy, selectedDateRange }) => {
   const { t } = useTranslation();
-  const currentMetrics = activeTab === 'Weather' ? weatherMetrics : sondeMetrics;
-  // All metrics should be displayed as the bottom sheet is now scrollable
-  const displayMetrics = currentMetrics;
+  
+  const getDynamicMetrics = (metrics, buoyId, dateRange) => {
+    const seed = (buoyId || 1) + (dateRange?.length || 0);
+    return metrics.map((metric, index) => {
+      const numMatch = metric.value.match(/[\d.]+/);
+      if (numMatch) {
+        const baseValue = parseFloat(numMatch[0]);
+        // Use a deterministic variation based on seed and index
+        const variation = Math.sin(seed + index) * (baseValue * 0.1); // up to 10% variation
+        const newValue = Math.max(0, baseValue + variation).toFixed(metric.label === 'pH' ? 2 : 1);
+        const newValueStr = metric.value.replace(/[\d.]+/, newValue);
+        return { ...metric, value: newValueStr };
+      }
+      return metric;
+    });
+  };
+
+  const baseMetrics = activeTab === 'Weather' ? weatherMetrics : sondeMetrics;
+  const displayMetrics = getDynamicMetrics(baseMetrics, selectedBuoy?.id, selectedDateRange);
 
   return (
     <div 
-      className={`w-full ${isMobile ? 'grid grid-cols-2 md:grid-cols-3 gap-[10px] md:gap-[16px]' : 'h-full grid gap-[14px]'}`}
+      className={`w-full ${isMobile ? 'grid grid-cols-2 md:grid-cols-3 gap-[10px] md:gap-[16px]' : 'grid gap-[10px]'}`}
       style={!isMobile ? {
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gridTemplateRows: 'repeat(3, 1fr)'
+        gridAutoRows: '82px'
       } : {}}
     >
       {displayMetrics.map((metric) => (

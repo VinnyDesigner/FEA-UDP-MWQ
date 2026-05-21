@@ -2,13 +2,77 @@ import React from 'react';
 import { Clock, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
+const BuoyStatusCard = ({ activeTab, selectedBuoy, selectedMetric, isMobile = false }) => {
   const { t } = useTranslation();
   const isWeather = activeTab === 'Weather';
   const buoyName = selectedBuoy ? selectedBuoy.name : 'AL Aqah Buoy';
-  const buoyTemp = selectedBuoy ? selectedBuoy.temp : '25.1';
   const updatedTime = selectedBuoy ? selectedBuoy.updated : '2 min ago';
   const dataInterval = selectedBuoy ? selectedBuoy.interval : (isWeather ? '10 min' : '30 min');
+
+  const defaultMetric = isWeather ? 'Air Temperature (°c)' : 'Water Temperature (°c)';
+  const currentMetric = selectedMetric || defaultMetric;
+
+  // Extract label and unit
+  const metricParts = currentMetric.split('(');
+  const metricLabel = metricParts[0].trim();
+  const metricUnit = metricParts[1] ? metricParts[1].replace(')', '') : '';
+
+  // Generate pseudo-dynamic value based on metric and buoy
+  const getValue = () => {
+    const seed = (selectedBuoy?.id || 1) + (currentMetric.length || 0);
+    const variation = Math.sin(seed) * 5;
+    
+    const baseValues = {
+      'Water Temperature (°c)': 25.1,
+      'Salinity (ppt)': 36.4,
+      'Chlorophyll (ug)': 1.7,
+      'Dissolved Oxygen (mg/l)': 5.63,
+      'pH': 7.97,
+      'Turbidity (NTU)': 0.02,
+      'Blue-Green Algae (ug)': 0.65,
+      'Depth(m)': 166,
+      'Specific Conductivity(uS)': 12.5,
+      'Air Temperature (°c)': 24.2,
+      'Relative Humidity (%)': 65,
+      'AWS (m/s)': 4.2,
+      'AWD (Degree)': 120,
+      'Wind Gust (Wind Gust)': 6.5,
+      'Pressure (bar)': 1.013
+    };
+
+    const base = baseValues[currentMetric] || 25.0;
+    const value = base + variation;
+    
+    if (currentMetric.includes('pH') || currentMetric.includes('Turbidity') || currentMetric.includes('Algae') || currentMetric.includes('Chlorophyll') || currentMetric.includes('Oxygen')) {
+      return value.toFixed(2);
+    }
+    if (currentMetric.includes('Temperature') || currentMetric.includes('Salinity') || currentMetric.includes('Conductivity')) {
+      return value.toFixed(1);
+    }
+    return Math.round(value).toString();
+  };
+
+  const displayValue = getValue();
+
+  const getMinMax = () => {
+    const val = parseFloat(displayValue);
+    if (isNaN(val)) return { min: '--', max: '--' };
+    
+    const seed = (selectedBuoy?.id || 1) + (currentMetric.length || 0);
+    const variation = Math.abs(Math.cos(seed) * (val * 0.15)); // 15% variation
+    
+    const minVal = Math.max(0, val - variation);
+    const maxVal = val + variation;
+    
+    const precision = displayValue.includes('.') ? displayValue.split('.')[1].length : 0;
+    
+    return {
+      min: minVal.toFixed(precision),
+      max: maxVal.toFixed(precision)
+    };
+  };
+
+  const { min, max } = getMinMax();
 
   if (isMobile) {
     return (
@@ -42,12 +106,19 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
               <p className="text-[18px] font-bold text-white tracking-wide uppercase">{buoyName}</p>
             </div>
             <div className="w-full h-[1px] bg-white/10 mb-1" />
-            <p className="text-white/80 text-[12px] mb-0.5">{isWeather ? t('dashboard.airTemperature') : t('dashboard.waterTemperature')}</p>
+            <p className="text-white/80 text-[12px] mb-0.5">{metricLabel}</p>
             <div className="flex items-baseline justify-center mb-1">
               <span className="font-bold leading-none" style={{ fontSize: '36px', color: '#1DCDDD', textShadow: '0 0 24px rgba(29,205,221,0.6)' }}>
-                {isWeather ? (parseFloat(buoyTemp) - 2.7).toFixed(1) : buoyTemp}
+                {displayValue}
               </span>
-              <span className="text-base font-bold text-[#1DCDDD] rtl:mr-1 ltr:ml-1">°C</span>
+              {metricUnit && (
+                <span className="text-base font-bold text-[#1DCDDD] rtl:mr-1 ltr:ml-1">{metricUnit}</span>
+              )}
+            </div>
+            <div className="flex gap-2 mb-2 justify-center text-[10px] text-white/50">
+              <span>Min: <span className="text-white font-semibold">{min}{metricUnit}</span></span>
+              <span>|</span>
+              <span>Max: <span className="text-white font-semibold">{max}{metricUnit}</span></span>
             </div>
             <div className="w-full h-[1px] bg-white/10 mb-2" />
           </div>
@@ -96,12 +167,20 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
             <div className="w-full h-[1px] bg-white/10 my-2" />
 
             <div className="flex items-center gap-6">
-              <p className="text-white/80 text-[16px]">{isWeather ? t('dashboard.airTemperature') : t('dashboard.waterTemperature')}</p>
-              <div className="flex items-baseline">
-                <span className="font-bold" style={{ fontSize: '48px', color: '#1DCDDD', textShadow: '0 0 30px rgba(29,205,221,0.6)' }}>
-                  {isWeather ? (parseFloat(buoyTemp) - 2.7).toFixed(1) : buoyTemp}
-                </span>
-                <span className="text-2xl font-bold text-[#1DCDDD] rtl:mr-1 ltr:ml-1">°C</span>
+              <p className="text-white/80 text-[16px]">{metricLabel}</p>
+              <div className="flex items-baseline gap-4">
+                <div className="flex items-baseline">
+                  <span className="font-bold" style={{ fontSize: '48px', color: '#1DCDDD', textShadow: '0 0 30px rgba(29,205,221,0.6)' }}>
+                    {displayValue}
+                  </span>
+                  {metricUnit && (
+                    <span className="text-2xl font-bold text-[#1DCDDD] rtl:mr-1 ltr:ml-1">{metricUnit}</span>
+                  )}
+                </div>
+                <div className="flex flex-col text-xs text-white/60">
+                  <span>Min: <span className="text-white font-semibold">{min}{metricUnit}</span></span>
+                  <span>Max: <span className="text-white font-semibold">{max}{metricUnit}</span></span>
+                </div>
               </div>
             </div>
           </div>
@@ -167,7 +246,7 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
         </div>
 
         <p className="text-white/60 font-medium text-[12px] mb-1">
-          {isWeather ? t('dashboard.airTemperature') : t('dashboard.waterTemperature')}
+          {metricLabel}
         </p>
         <div className="flex items-start justify-center">
           <span 
@@ -178,9 +257,22 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
               textShadow: '0 0 30px rgba(29,205,221,0.6)' 
             }}
           >
-            {isWeather ? (parseFloat(buoyTemp) - 2.7).toFixed(1) : buoyTemp}
+            {displayValue}
           </span>
-          <span className="text-4xl mt-2 font-bold text-[#1DCDDD]" style={{ textShadow: '0 0 20px rgba(29,205,221,0.5)' }}>°c</span>
+          {metricUnit && (
+            <span className="text-4xl mt-2 font-bold text-[#1DCDDD]" style={{ textShadow: '0 0 20px rgba(29,205,221,0.5)' }}>{metricUnit}</span>
+          )}
+        </div>
+
+        <div className="flex gap-4 mt-1 justify-center">
+          <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
+            <span className="text-[10px] text-white/50 uppercase">Min</span>
+            <span className="text-xs font-semibold text-white">{min}{metricUnit}</span>
+          </div>
+          <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
+            <span className="text-[10px] text-white/50 uppercase">Max</span>
+            <span className="text-xs font-semibold text-white">{max}{metricUnit}</span>
+          </div>
         </div>
       </div>
 

@@ -53,21 +53,22 @@ const FAQAccordion = ({ isMobile = false }) => {
         return (
           <div 
             key={index}
-            className={`transition-all duration-300 border ${
+            onClick={() => setOpenIndex(isOpen ? -1 : index)}
+            className={`transition-all duration-300 border cursor-pointer ${
               isOpen 
                 ? 'bg-white/10 border-white/20 p-5 md:p-8 rounded-[20px] md:rounded-[30px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]' 
                 : 'bg-transparent border-transparent p-5 md:px-8 md:py-4 rounded-[20px]'
             }`}
             style={isOpen ? {
-              backdropFilter: 'blur(20px)',
+              backdropFilter: 'blur(4.400000095367432px)',
+              boxShadow: '3px 3px 4px 0 rgba(255, 255, 255, 0.17) inset',
               background: 'radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.14) 100%)',
             } : {}}
           >
-            <button 
-              onClick={() => setOpenIndex(isOpen ? -1 : index)}
+            <div 
               className="w-full flex items-center justify-between text-left group gap-4"
             >
-              <span className={`text-[16px] font-bold transition-colors ${
+              <span className={`text-[14px] font-bold transition-colors ${
                 isOpen ? 'text-white' : 'text-white/80 group-hover:text-white'
               }`}>
                 {item.question}
@@ -77,11 +78,14 @@ const FAQAccordion = ({ isMobile = false }) => {
               ) : (
                 <ChevronDown size={20} className="text-white/40 group-hover:text-white/60 flex-shrink-0" />
               )}
-            </button>
+            </div>
             
             {isOpen && (
-              <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-white/70 text-[14px] leading-relaxed max-w-[95%] md:max-w-[90%]">
+              <div 
+                className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className="text-white/70 text-[12px] leading-relaxed max-w-[95%] md:max-w-[90%]">
                   {item.answer}
                 </p>
               </div>

@@ -48,7 +48,9 @@
   "analytics": {
     "pageTitle": "لوحة مراقبة جودة المياه البحرية - تحليلات النظام",
     "pageSubtitle": "سجلات مخصصة للمتغيرات لتتبع الأداء والتحليل البيئي.",
+    "liveData": "البيانات الحية",
     "buoysAnalytics": "تحليلات العوامات",
+    "stationHealth": "صحة المحطة",
     "sensorData": "بيانات الاستشعار",
     "dataCaptureRate": "معدل التقاط البيانات",
     "validDataCaptureRate": "معدل التقاط البيانات الصالحة",

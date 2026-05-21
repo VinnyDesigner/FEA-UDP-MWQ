@@ -7,10 +7,7 @@ import logo from '../assets/logo-auth.png';
 const AuthLayout = () => {
   return (
     <div 
-      className="w-screen min-h-screen overflow-y-auto overflow-x-hidden lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row"
-      style={{
-        background: 'radial-gradient(60.93% 60.93% at 50% 40.46%, #009FAC 0%, #000000 100%)'
-      }}
+      className="w-screen min-h-screen overflow-y-auto overflow-x-hidden lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row bg-transparent"
     >
       {/* Left Panel — full width on mobile & tablet, 45% on desktop */}
       <div className="w-full lg:h-full lg:w-[45%] flex flex-col z-10">

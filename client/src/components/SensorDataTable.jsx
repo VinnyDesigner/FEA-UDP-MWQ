@@ -61,7 +61,7 @@ const sensorData = [
   }
 ];
 
-const SensorDataTable = ({ isMobile = false }) => {
+const SensorDataTable = ({ isMobile = false, selectedBuoy = 'Al Aqah New' }) => {
   const { t } = useTranslation();
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -83,7 +83,7 @@ const SensorDataTable = ({ isMobile = false }) => {
             <div className="flex flex-col gap-2 pb-3 border-b border-white/10">
               <div className="flex flex-col">
                 <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.station')}</span>
-                <span className="text-[18px] font-bold text-white">{row.station}</span>
+                <span className="text-[18px] font-bold text-white">{selectedBuoy}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.dateTime')}</span>
@@ -150,7 +150,7 @@ const SensorDataTable = ({ isMobile = false }) => {
             <div className="flex-1">
               {sensorData.map((row, index) => (
                 <div key={index} className="px-6 py-3 text-white/90 text-[14px] font-bold border-b border-white/10 h-[50px] flex items-center whitespace-nowrap">
-                  {row.station}
+                  {selectedBuoy}
                 </div>
               ))}
             </div>
@@ -234,7 +234,7 @@ const SensorDataTable = ({ isMobile = false }) => {
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex justify-center md:justify-end items-center gap-2 mt-auto pt-6 pb-3">
+      <div className="flex justify-end items-center gap-2 mt-auto pt-6 pb-3">
         <button 
           className="w-10 h-10 flex items-center justify-center transition-all hover:brightness-110 active:scale-95"
           style={{

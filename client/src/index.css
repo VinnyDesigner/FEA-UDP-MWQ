@@ -1,7 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
 /* Add Leaflet CSS */
 @import 'leaflet/dist/leaflet.css';
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
 
 html.font-arabic {
   font-family: 'Cairo', sans-serif;
@@ -32,6 +32,30 @@ body {
   width: 100%;
   height: 100%;
 }
+
+/* ── Panel Metrics Scrollbar ── */
+.panel-metrics-scrollbar::-webkit-scrollbar { width: 4px; }
+.panel-metrics-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.panel-metrics-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 159, 172, 0.35);
+  border-radius: 4px;
+}
+.panel-metrics-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 159, 172, 0.6);
+}
+.panel-metrics-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(0,159,172,0.35) transparent; }
+
+/* ── Panel Chart Scrollbar ── */
+.panel-chart-scrollbar::-webkit-scrollbar { width: 4px; }
+.panel-chart-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.panel-chart-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 159, 172, 0.35);
+  border-radius: 4px;
+}
+.panel-chart-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 159, 172, 0.6);
+}
+.panel-chart-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(0,159,172,0.35) transparent; }
 
 /* Scrollbar Hide Utility */
 .scrollbar-hide {
