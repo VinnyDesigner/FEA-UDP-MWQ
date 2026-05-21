@@ -62,22 +62,23 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isLocationOpen, isTabDropdownOpen]);
 
-  const dropdownButtonStyle = "flex items-center justify-between w-full px-5 py-2.5 backdrop-blur-md text-[#072227] text-[14px] font-semibold transition-all outline-none cursor-pointer";
+  const dropdownButtonStyle = "flex items-center justify-between w-full px-5 py-2.5 backdrop-blur-xl text-[#072227] text-[14px] font-semibold transition-all outline-none cursor-pointer";
  
   const customDropdownButtonStyle = {
-    borderRadius: '24px',
+    borderRadius: '12px',
     border: '1px solid rgba(255, 255, 255, 0.30)',
     background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
     boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
+    backdropFilter: 'blur(10px)',
   };
 
   const dropdownListStyle = {
     borderRadius: '20px',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    background: 'radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
     backdropFilter: 'blur(20px)',
-    color: '#072227',
-    boxShadow: '0 12px 40px rgba(0,0,0,0.15)'
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 12px 40px rgba(0,0,0,0.25)'
   };
  
   return (
@@ -108,7 +109,7 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
             {stations.map((station) => (
               <button
                 key={station.id}
-                className="text-left text-[#072227] text-[13px] font-semibold hover:text-[#009FAC] hover:bg-black/5 p-2 rounded-lg transition-colors"
+                className="text-left text-white text-[14px] font-bold hover:text-[#1DCDDD] p-2 rounded-lg transition-colors"
                 onClick={() => {
                   if (setSelectedBuoy) setSelectedBuoy(station);
                   setIsLocationOpen(false);
@@ -148,8 +149,8 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
             {['Sonde', 'Weather'].map((tab) => (
               <button
                 key={tab}
-                className={`text-left text-[13px] font-semibold p-2 rounded-lg transition-colors ${
-                  activeTab === tab ? 'text-[#009FAC] bg-[#009FAC]/10 font-bold' : 'text-[#072227] hover:text-[#009FAC] hover:bg-black/5'
+                className={`text-left text-[14px] font-bold p-2 rounded-lg transition-colors ${
+                  activeTab === tab ? 'text-[#1DCDDD]' : 'text-white hover:text-[#1DCDDD]'
                 }`}
                 onClick={() => {
                   setActiveTab(tab);

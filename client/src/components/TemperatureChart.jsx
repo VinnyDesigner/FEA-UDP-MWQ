@@ -162,26 +162,26 @@ const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }
       {isOpen && createPortal(
         <div 
           ref={dropdownRef}
-          className="fixed z-[9999] p-3 flex flex-col gap-2"
+          className="fixed z-[9999] p-4 flex flex-col gap-3"
           style={{
             top: dropdownPos.top,
             left: dropdownPos.left,
-            minWidth: '150px',
-            borderRadius: '16px',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            background: 'radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%)',
+            minWidth: '170px',
+            borderRadius: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
             backdropFilter: 'blur(20px)',
-            color: '#072227',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.1)'
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: '0 12px 40px rgba(0,0,0,0.25)'
           }}
         >
           {dateRanges.map((range) => (
             <button
               key={range}
-              className={`text-left text-xs font-semibold p-1.5 rounded-lg transition-colors ${
+              className={`text-left text-[13px] font-bold transition-colors ${
                 (selectedDateRange || 'Last 24 Hours') === range 
-                  ? 'text-[#009FAC] bg-[#009FAC]/10 font-bold' 
-                  : 'text-[#072227] hover:text-[#009FAC] hover:bg-black/5'
+                  ? 'text-[#1DCDDD]' 
+                  : 'text-white hover:text-[#1DCDDD]'
               }`}
               onClick={() => {
                 if (setSelectedDateRange) setSelectedDateRange(range);
@@ -194,14 +194,14 @@ const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }
             </button>
           ))}
           {selectedDateRange === 'Custom Range' && (
-            <div className="border-t border-black/5 mt-1 pt-2 flex flex-col gap-1.5">
+            <div className="border-t border-white/10 mt-1 pt-2 flex flex-col gap-1.5">
               <div className="flex flex-col gap-0.5">
-                <label className="text-[9px] text-[#072227]/60">From</label>
-                <input type="date" className="bg-black/5 border border-black/10 rounded px-1.5 py-0.5 text-xs text-[#072227] outline-none" style={{colorScheme: 'light'}} />
+                <label className="text-[9px] text-white/60">From</label>
+                <input type="date" className="bg-white/10 border border-white/20 rounded px-1.5 py-0.5 text-xs text-white outline-none" style={{colorScheme: 'dark'}} />
               </div>
               <div className="flex flex-col gap-0.5">
-                <label className="text-[9px] text-[#072227]/60">To</label>
-                <input type="date" className="bg-black/5 border border-black/10 rounded px-1.5 py-0.5 text-xs text-[#072227] outline-none" style={{colorScheme: 'light'}} />
+                <label className="text-[9px] text-white/60">To</label>
+                <input type="date" className="bg-white/10 border border-white/20 rounded px-1.5 py-0.5 text-xs text-white outline-none" style={{colorScheme: 'dark'}} />
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
