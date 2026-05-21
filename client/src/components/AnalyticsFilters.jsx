@@ -96,8 +96,14 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterOpen, isViewDropdownOpen, isBuoyDropdownOpen]);
 
-  // Trigger Style (Matches Reports Page input boxes)
-  const dropdownClass = "flex items-center justify-between px-4 h-[44px] bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium w-full mt-1.5 transition-all hover:bg-white/10 hover:border-white/30 outline-none select-none cursor-pointer";
+  // Trigger Style (Inactive tab pill — matches "Buoys Analytics" tab)
+  const dropdownClass = "flex items-center justify-between px-5 py-2.5 text-white text-[13px] font-medium w-full transition-all outline-none select-none cursor-pointer whitespace-nowrap";
+  const tabTriggerStyle = {
+    borderRadius: '24px',
+    border: '1px solid rgba(255, 255, 255, 0.30)',
+    background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
+    boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
+  };
   const labelClass = "text-white text-[12px] font-bold ml-1 tracking-tight uppercase opacity-85";
 
   // Dropdown list styling (Matching Screenshots 1, 2, and 3: rounded 28px glassmorphism overlay card)
@@ -130,12 +136,12 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
       <div className={`flex ${isMobile ? 'flex-col gap-4 w-full' : 'flex-row items-end gap-4'}`}>
         
         {/* View Type Dropdown */}
-        <div className="flex-1 flex flex-col min-w-[200px]">
-          <span className={labelClass}>{t('reports.type', 'View')}</span>
+        <div className="flex-1 flex flex-col min-w-[160px]">
           <button 
             ref={viewBtnRef}
             onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
             className={dropdownClass}
+            style={tabTriggerStyle}
           >
             <span className="truncate">{selectedView}</span>
             <ChevronDown size={14} className={`transition-transform duration-300 ${isViewDropdownOpen ? 'rotate-180' : ''} text-white/70`} />
@@ -154,12 +160,16 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
               {/* Radio Group List */}
               <div className="flex flex-col gap-5">
                 {viewTypes.map((type) => {
-                  const isChecked = tempSelectedView === type;
+                  const isChecked = selectedView === type;
                   return (
                     <button
                       key={type}
                       className="flex items-center gap-4 text-left outline-none cursor-pointer group"
-                      onClick={() => setTempSelectedView(type)}
+                      onClick={() => {
+                        setTempSelectedView(type);
+                        if (setSelectedView) setSelectedView(type);
+                        setIsViewDropdownOpen(false);
+                      }}
                     >
                       {/* Custom Radio Circle */}
                       <div 
@@ -172,38 +182,18 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
                   );
                 })}
               </div>
-
-              {/* Bottom Actions Row */}
-              <div className="flex items-center justify-end gap-6 pt-2 border-t border-white/5">
-                <button
-                  className="text-white/80 hover:text-white font-semibold text-[15px] cursor-pointer outline-none transition-colors"
-                  onClick={() => setIsViewDropdownOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  style={applyButtonStyle}
-                  className="hover:scale-[1.03] active:scale-[0.97]"
-                  onClick={() => {
-                    if (setSelectedView) setSelectedView(tempSelectedView);
-                    setIsViewDropdownOpen(false);
-                  }}
-                >
-                  Apply Filters
-                </button>
-              </div>
             </div>,
             document.body
           )}
         </div>
 
         {/* Location/Buoy Dropdown */}
-        <div className="flex-1 flex flex-col min-w-[200px]">
-          <span className={labelClass}>{t('analytics.station', 'Station')}</span>
+        <div className="flex-1 flex flex-col min-w-[160px]">
           <button 
             ref={buoyBtnRef}
             onClick={() => setIsBuoyDropdownOpen(!isBuoyDropdownOpen)}
             className={dropdownClass}
+            style={tabTriggerStyle}
           >
             <span className="truncate">{selectedBuoy}</span>
             <ChevronDown size={14} className={`transition-transform duration-300 ${isBuoyDropdownOpen ? 'rotate-180' : ''} text-white/70`} />
@@ -227,12 +217,16 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
               {/* Radio Group List */}
               <div className="flex flex-col gap-5">
                 {buoys.map((buoy) => {
-                  const isChecked = tempSelectedBuoy === buoy;
+                  const isChecked = selectedBuoy === buoy;
                   return (
                     <button
                       key={buoy}
                       className="flex items-center gap-4 text-left outline-none cursor-pointer group"
-                      onClick={() => setTempSelectedBuoy(buoy)}
+                      onClick={() => {
+                        setTempSelectedBuoy(buoy);
+                        if (setSelectedBuoy) setSelectedBuoy(buoy);
+                        setIsBuoyDropdownOpen(false);
+                      }}
                     >
                       {/* Radio Circle with Checkmark inside when checked */}
                       <div 
@@ -251,26 +245,6 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
                   );
                 })}
               </div>
-
-              {/* Bottom Actions Row */}
-              <div className="flex items-center justify-end gap-6 pt-2 border-t border-white/5">
-                <button
-                  className="text-white/80 hover:text-white font-semibold text-[15px] cursor-pointer outline-none transition-colors"
-                  onClick={() => setIsBuoyDropdownOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  style={applyButtonStyle}
-                  className="hover:scale-[1.03] active:scale-[0.97]"
-                  onClick={() => {
-                    if (setSelectedBuoy) setSelectedBuoy(tempSelectedBuoy);
-                    setIsBuoyDropdownOpen(false);
-                  }}
-                >
-                  Apply Filters
-                </button>
-              </div>
             </div>,
             document.body
           )}
@@ -278,8 +252,6 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
 
         {/* Filter Button */}
         <div className="flex flex-col">
-          {/* Label spacer on desktop to align buttons perfectly on the bottom line */}
-          <span className={`${labelClass} hidden lg:block opacity-0 select-none`}>Filter</span>
           <button 
             ref={filterBtnRef}
             onClick={() => setIsFilterOpen(!isFilterOpen)}
