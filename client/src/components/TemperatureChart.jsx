@@ -105,6 +105,23 @@ const weatherMetrics = [
   'Pressure (bar)'
 ];
 
+const windroseMetrics = [
+  'Wind Speed (m/s)',
+  'Wind Direction (°)',
+  'Wind Gust (m/s)',
+  'Max Wind Speed (m/s)',
+  'Calm Percent (%)',
+  'Mean Velocity (m/s)'
+];
+
+const windroseData = [
+  { time: '17 Feb 2026', hour: '9:30AM', temp: 15 },
+  { time: '17 Feb 2026', hour: '10:00AM', temp: 24 },
+  { time: '17 Feb 2026', hour: '10:30AM', temp: 18 },
+  { time: '17 Feb 2026', hour: '11:00AM', temp: 30 },
+  { time: '17 Feb 2026', hour: '11:30AM', temp: 22 }
+];
+
 const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -221,9 +238,10 @@ const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }
 const TemperatureChart = ({ activeTab, selectedBuoy, selectedMetric, setSelectedMetric, isMobile = false, selectedDateRange, setSelectedDateRange }) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n?.language === 'ar';
+  const isWindrose = activeTab === 'Windrose';
   const isWeather = activeTab === 'Weather';
-  const rawData = isWeather ? weatherData : sondeData;
-  const metrics = isWeather ? weatherMetrics : sondeMetrics;
+  const rawData = isWindrose ? windroseData : (isWeather ? weatherData : sondeData);
+  const metrics = isWindrose ? windroseMetrics : (isWeather ? weatherMetrics : sondeMetrics);
   
   const containerRef = useRef(null);
   const chartRefs = useRef({});
@@ -260,7 +278,13 @@ const TemperatureChart = ({ activeTab, selectedBuoy, selectedMetric, setSelected
     'AWS (m/s)': 'dashboard.aws',
     'AWD (Degree)': 'dashboard.awd',
     'Wind Gust (Wind Gust)': 'dashboard.windGust',
-    'Pressure (bar)': 'dashboard.pressure'
+    'Pressure (bar)': 'dashboard.pressure',
+    'Wind Speed (m/s)': 'dashboard.aws',
+    'Wind Direction (°)': 'dashboard.awd',
+    'Wind Gust (m/s)': 'dashboard.windGust',
+    'Max Wind Speed (m/s)': 'dashboard.maxWindSpeed',
+    'Calm Percent (%)': 'dashboard.calmPercent',
+    'Mean Velocity (m/s)': 'dashboard.meanVelocity'
   };
 
   // Track which metric the IntersectionObserver last set — prevents scroll loop

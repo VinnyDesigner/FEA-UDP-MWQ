@@ -62,6 +62,14 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isLocationOpen, isTabDropdownOpen]);
 
+  const [tempSelectedTab, setTempSelectedTab] = useState(activeTab);
+
+  useEffect(() => {
+    if (isTabDropdownOpen) {
+      setTempSelectedTab(activeTab);
+    }
+  }, [isTabDropdownOpen, activeTab]);
+
   const dropdownButtonStyle = "flex items-center justify-between w-full px-5 py-2.5 backdrop-blur-xl text-[#072227] text-[14px] font-semibold transition-all outline-none cursor-pointer";
  
   const customDropdownButtonStyle = {
@@ -79,6 +87,15 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     boxShadow: '0 12px 40px rgba(0,0,0,0.25)'
+  };
+
+  const tabDropdownListStyle = {
+    borderRadius: '24px',
+    border: '1px solid rgba(255, 255, 255, 0.45)',
+    background: 'radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.44) 100%)',
+    backdropFilter: 'blur(15px)',
+    WebkitBackdropFilter: 'blur(15px)',
+    boxShadow: '3px 3px 4px 0 rgba(255, 255, 255, 0.17) inset, 0 12px 40px rgba(0, 0, 0, 0.15)'
   };
  
   return (
@@ -123,7 +140,7 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
         )}
       </div>
 
-      {/* Tab (Sonde/Weather) Dropdown */}
+      {/* Tab (Sonde/Weather/Windrose) Dropdown */}
       <div className="flex-1 relative">
         <button
           ref={tabBtnRef}
@@ -131,35 +148,80 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
           className={dropdownButtonStyle}
           style={customDropdownButtonStyle}
         >
-          <span>{activeTab === 'Sonde' ? t('dashboard.sonde') : t('dashboard.weather')}</span>
+          <span>
+            {activeTab === 'Sonde' 
+              ? t('dashboard.sonde', 'Sonde') 
+              : activeTab === 'Weather' 
+                ? t('dashboard.weather', 'Weather') 
+                : t('dashboard.windrose', 'Windrose')}
+          </span>
           <ChevronDown size={14} className={`flex-shrink-0 transition-transform duration-300 ${isTabDropdownOpen ? 'rotate-180' : ''} text-[#072227]/70`} />
         </button>
         
         {isTabDropdownOpen && createPortal(
           <div 
             ref={tabDropdownRef}
-            className="fixed z-[9999] p-3 flex flex-col gap-2"
+            className="fixed z-[9999] p-5 flex flex-col gap-4"
             style={{
               top: tabDropdownPos.top,
               left: tabDropdownPos.left,
-              width: tabBtnRef.current ? `${tabBtnRef.current.offsetWidth}px` : '140px',
-              ...dropdownListStyle
+              width: '280px',
+              ...tabDropdownListStyle
             }}
           >
-            {['Sonde', 'Weather'].map((tab) => (
+            {/* Options list */}
+            <div className="flex flex-col gap-3">
+              {['Sonde', 'Weather', 'Windrose'].map((tab) => {
+                const isChecked = tempSelectedTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    className="flex items-center gap-3 w-full py-1.5 px-1.5 transition-colors cursor-pointer text-left focus:outline-none"
+                    onClick={() => setTempSelectedTab(tab)}
+                  >
+                    <div 
+                      className={`w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center transition-all ${
+                        isChecked ? 'bg-white border-white' : 'border-white/40 bg-transparent'
+                      }`}
+                    >
+                      {isChecked && (
+                        <div className="w-[10px] h-[10px] rounded-full bg-[#009FAC]" />
+                      )}
+                    </div>
+                    <span className={`text-[15px] font-bold transition-all ${isChecked ? 'text-white' : 'text-white/70 hover:text-white'}`}>
+                      {tab === 'Sonde' 
+                        ? t('dashboard.sonde', 'Sonde') 
+                        : tab === 'Weather' 
+                          ? t('dashboard.weather', 'Weather') 
+                          : t('dashboard.windrose', 'Windrose')}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/10">
               <button
-                key={tab}
-                className={`text-left text-[14px] font-bold p-2 rounded-lg transition-colors ${
-                  activeTab === tab ? 'text-[#1DCDDD]' : 'text-white hover:text-[#1DCDDD]'
-                }`}
+                onClick={() => setIsTabDropdownOpen(false)}
+                className="text-white/80 hover:text-white font-bold text-[14px] px-2 py-1.5 cursor-pointer transition-colors focus:outline-none"
+              >
+                {t('common.cancel', 'Cancel')}
+              </button>
+              <button
                 onClick={() => {
-                  setActiveTab(tab);
+                  setActiveTab(tempSelectedTab);
                   setIsTabDropdownOpen(false);
                 }}
+                className="px-5 py-2 rounded-full font-bold text-white text-[13.5px] hover:scale-[1.03] active:scale-95 transition-all cursor-pointer shadow-lg focus:outline-none"
+                style={{
+                  background: 'linear-gradient(135deg, #1DCDDD 0%, #009FAC 100%)',
+                  boxShadow: '0 4px 15px rgba(0, 159, 172, 0.4), inset 0 2px 2px rgba(255, 255, 255, 0.3)'
+                }}
               >
-                {tab === 'Sonde' ? t('dashboard.sonde') : t('dashboard.weather')}
+                {t('common.apply', 'Apply Filters')}
               </button>
-            ))}
+            </div>
           </div>,
           document.body
         )}

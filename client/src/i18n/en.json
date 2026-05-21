@@ -43,7 +43,11 @@
     "solarRadiation": "Solar Radiation (W/m²)",
     "rainfall": "Rainfall (mm)",
     "windGust": "Wind Gust (Wind Gust)",
-    "pressure": "Pressure (bar)"
+    "pressure": "Pressure (bar)",
+    "windrose": "Windrose",
+    "maxWindSpeed": "Max Wind Speed (m/s)",
+    "calmPercent": "Calm Percent (%)",
+    "meanVelocity": "Mean Velocity (m/s)"
   },
   "analytics": {
     "pageTitle": "Marine Water Quality Monitoring Dashboard - MIS Analytics",

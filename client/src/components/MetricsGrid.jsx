@@ -24,6 +24,15 @@ const weatherMetrics = [
   { label: 'Pressure (bar)', labelKey: 'dashboard.pressure', value: '20.5 bar', icon: '/assets/weather/pressure.png' },
 ];
 
+const windroseMetrics = [
+  { label: 'Wind Speed (m/s)', labelKey: 'dashboard.aws', value: '5.4 m/s', icon: '/assets/weather/wind.png' },
+  { label: 'Wind Direction (°)', labelKey: 'dashboard.awd', value: '180°', icon: '/assets/weather/awd.png' },
+  { label: 'Wind Gust (m/s)', labelKey: 'dashboard.windGust', value: '8.2 m/s', icon: '/assets/weather/gust.png' },
+  { label: 'Max Wind Speed (m/s)', labelKey: 'dashboard.maxWindSpeed', value: '12.4 m/s', icon: '/assets/weather/wind.png' },
+  { label: 'Calm Percent (%)', labelKey: 'dashboard.calmPercent', value: '1.2%', icon: '/assets/weather/humidity.png' },
+  { label: 'Mean Velocity (m/s)', labelKey: 'dashboard.meanVelocity', value: '4.8 m/s', icon: '/assets/weather/wind.png' },
+];
+
 const MetricsGrid = ({ activeTab, selectedMetric, setSelectedMetric, isMobile = false, selectedBuoy, selectedDateRange }) => {
   const { t } = useTranslation();
   
@@ -43,7 +52,11 @@ const MetricsGrid = ({ activeTab, selectedMetric, setSelectedMetric, isMobile = 
     });
   };
 
-  const baseMetrics = activeTab === 'Weather' ? weatherMetrics : sondeMetrics;
+  const baseMetrics = activeTab === 'Windrose' 
+    ? windroseMetrics 
+    : activeTab === 'Weather' 
+      ? weatherMetrics 
+      : sondeMetrics;
   const displayMetrics = getDynamicMetrics(baseMetrics, selectedBuoy?.id, selectedDateRange);
 
   return (

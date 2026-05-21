@@ -43,7 +43,11 @@
     "solarRadiation": "الإشعاع الشمسي (W/m²)",
     "rainfall": "هطول الأمطار (mm)",
     "windGust": "هبات الرياح",
-    "pressure": "الضغط (bar)"
+    "pressure": "الضغط (bar)",
+    "windrose": "مخطط الرياح",
+    "maxWindSpeed": "أقصى سرعة للرياح (m/s)",
+    "calmPercent": "نسبة السكون (%)",
+    "meanVelocity": "متوسط السرعة (m/s)"
   },
   "analytics": {
     "pageTitle": "لوحة مراقبة جودة المياه البحرية - تحليلات النظام",
