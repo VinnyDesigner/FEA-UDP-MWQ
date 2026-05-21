@@ -97,9 +97,9 @@ const ReportsFilterForm = () => {
                   top: dropdownPos.top,
                   left: dropdownPos.left,
                   width: dropdownPos.width,
-                  borderRadius: '20px',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
+                  borderRadius: '21px',
+                  border: '1px solid rgba(0, 0, 0, 0.10)',
+                  background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
                   backdropFilter: 'blur(20px)',
                   WebkitBackdropFilter: 'blur(20px)',
                 }}
@@ -184,7 +184,7 @@ const ReportsFilterForm = () => {
               className="px-6 md:px-10 h-[48px] md:h-[44px] text-white text-[14px] md:text-[15px] font-bold tracking-wide flex items-center justify-center gap-1 transition-transform hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 background: 'radial-gradient(50% 50% at 50% 50%, #1DCDDD 0%, #009FAC 100%)',
-                borderRadius: '999px',
+                borderRadius: '29.455px',
                 boxShadow: '0 0 70px 0 rgba(0, 159, 172, 0.40), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset'
               }}
             >

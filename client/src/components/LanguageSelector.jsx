@@ -66,9 +66,9 @@ const LanguageSelector = ({ isIconOnly = false }) => {
         <div
           className={`absolute ${isIconOnly ? 'bottom-[calc(100%+8px)] left-0 rtl:left-auto rtl:right-0' : 'top-[calc(100%+8px)] right-0 rtl:right-auto rtl:left-0'} z-[9999] min-w-[160px] overflow-hidden`}
           style={{
-            borderRadius: '16px',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            background: 'rgba(0, 22, 26, 0.85)',
+            borderRadius: '21px',
+            border: '1px solid rgba(0, 0, 0, 0.10)',
+            background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
             backdropFilter: 'blur(20px)',
             boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
           }}

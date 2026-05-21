@@ -105,23 +105,6 @@ const weatherMetrics = [
   'Pressure (bar)'
 ];
 
-const windroseMetrics = [
-  'Wind Speed (m/s)',
-  'Wind Direction (°)',
-  'Wind Gust (m/s)',
-  'Max Wind Speed (m/s)',
-  'Calm Percent (%)',
-  'Mean Velocity (m/s)'
-];
-
-const windroseData = [
-  { time: '17 Feb 2026', hour: '9:30AM', temp: 15 },
-  { time: '17 Feb 2026', hour: '10:00AM', temp: 24 },
-  { time: '17 Feb 2026', hour: '10:30AM', temp: 18 },
-  { time: '17 Feb 2026', hour: '11:00AM', temp: 30 },
-  { time: '17 Feb 2026', hour: '11:30AM', temp: 22 }
-];
-
 const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -184,9 +167,9 @@ const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }
             top: dropdownPos.top,
             left: dropdownPos.left,
             minWidth: '170px',
-            borderRadius: '20px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
+            borderRadius: '21px',
+            border: '1px solid rgba(0, 0, 0, 0.10)',
+            background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             boxShadow: '0 12px 40px rgba(0,0,0,0.25)'
@@ -238,10 +221,9 @@ const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }
 const TemperatureChart = ({ activeTab, selectedBuoy, selectedMetric, setSelectedMetric, isMobile = false, selectedDateRange, setSelectedDateRange }) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n?.language === 'ar';
-  const isWindrose = activeTab === 'Windrose';
   const isWeather = activeTab === 'Weather';
-  const rawData = isWindrose ? windroseData : (isWeather ? weatherData : sondeData);
-  const metrics = isWindrose ? windroseMetrics : (isWeather ? weatherMetrics : sondeMetrics);
+  const rawData = isWeather ? weatherData : sondeData;
+  const metrics = isWeather ? weatherMetrics : sondeMetrics;
   
   const containerRef = useRef(null);
   const chartRefs = useRef({});
@@ -278,13 +260,7 @@ const TemperatureChart = ({ activeTab, selectedBuoy, selectedMetric, setSelected
     'AWS (m/s)': 'dashboard.aws',
     'AWD (Degree)': 'dashboard.awd',
     'Wind Gust (Wind Gust)': 'dashboard.windGust',
-    'Pressure (bar)': 'dashboard.pressure',
-    'Wind Speed (m/s)': 'dashboard.aws',
-    'Wind Direction (°)': 'dashboard.awd',
-    'Wind Gust (m/s)': 'dashboard.windGust',
-    'Max Wind Speed (m/s)': 'dashboard.maxWindSpeed',
-    'Calm Percent (%)': 'dashboard.calmPercent',
-    'Mean Velocity (m/s)': 'dashboard.meanVelocity'
+    'Pressure (bar)': 'dashboard.pressure'
   };
 
   // Track which metric the IntersectionObserver last set — prevents scroll loop

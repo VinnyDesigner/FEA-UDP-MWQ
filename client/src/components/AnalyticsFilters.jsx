@@ -102,9 +102,9 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
 
   // Dropdown list styling (Matching Screenshots 1, 2, and 3: rounded 28px glassmorphism overlay card)
   const glassDropdownStyle = {
-    borderRadius: '28px',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    background: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: '21px',
+    border: '1px solid rgba(0, 0, 0, 0.10)',
+    background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
     backdropFilter: 'blur(25px)',
     WebkitBackdropFilter: 'blur(25px)',
     boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)',
@@ -114,8 +114,8 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
   // CTA button styling matching Reports page "Download Report" CTA style
   const applyButtonStyle = {
     background: 'radial-gradient(50% 50% at 50% 50%, #1DCDDD 0%, #009FAC 100%)',
-    borderRadius: '999px',
-    boxShadow: '0 0 30px 0 rgba(0, 159, 172, 0.40), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset',
+    borderRadius: '29.455px',
+    boxShadow: '0 0 70px 0 rgba(0, 159, 172, 0.40), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset',
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: '14px',
@@ -286,8 +286,8 @@ const AnalyticsFilters = ({ isMobile = false, selectedBuoy = 'Al Aqah Buoy', set
             className="px-6 h-[44px] text-white text-[14px] font-bold tracking-wide flex items-center justify-center gap-1.5 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer mt-1.5 select-none"
             style={{
               background: 'radial-gradient(50% 50% at 50% 50%, #1DCDDD 0%, #009FAC 100%)',
-              borderRadius: '999px',
-              boxShadow: '0 0 40px 0 rgba(0, 159, 172, 0.40), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset'
+              borderRadius: '29.455px',
+              boxShadow: '0 0 70px 0 rgba(0, 159, 172, 0.40), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset'
             }}
           >
             <Filter size={14} className="text-white" />

@@ -24,13 +24,7 @@ const Dashboard = () => {
   const mapRef = useRef(null);
   const [activeTab, setActiveTab] = useState('Sonde');
   const [selectedBuoy, setSelectedBuoy] = useState(stations[0]);
-  const [selectedMetric, setSelectedMetric] = useState(
-    activeTab === 'Sonde' 
-      ? 'Water Temperature (°c)' 
-      : activeTab === 'Weather' 
-        ? 'Air Temperature (°c)' 
-        : 'Wind Speed (m/s)'
-  );
+  const [selectedMetric, setSelectedMetric] = useState(activeTab === 'Sonde' ? 'Water Temperature (°c)' : 'Air Temperature (°c)');
   const [selectedDateRange, setSelectedDateRange] = useState('Last 24 Hours');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
@@ -43,13 +37,7 @@ const Dashboard = () => {
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
 
   useEffect(() => {
-    setSelectedMetric(
-      activeTab === 'Sonde' 
-        ? 'Water Temperature (°c)' 
-        : activeTab === 'Weather' 
-          ? 'Air Temperature (°c)' 
-          : 'Wind Speed (m/s)'
-    );
+    setSelectedMetric(activeTab === 'Sonde' ? 'Water Temperature (°c)' : 'Air Temperature (°c)');
   }, [activeTab]);
 
   const handleDragEnd = (_, info) => {
