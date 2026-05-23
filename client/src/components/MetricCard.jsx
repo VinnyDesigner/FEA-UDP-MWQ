@@ -43,7 +43,7 @@ const MetricCard = ({ label, value, icon: Icon, isSelected, onClick, isMobile = 
           className="font-bold leading-tight tracking-tight whitespace-nowrap overflow-hidden text-ellipsis"
           style={{ 
             fontSize: '12px',
-            color: isSelected ? '#072227' : '#4A5568'
+            color: isSelected ? '#009FAC' : '#4A5568'
           }}
           title={label}
         >
@@ -54,7 +54,7 @@ const MetricCard = ({ label, value, icon: Icon, isSelected, onClick, isMobile = 
           style={{
             fontSize: '14px',
             marginTop: '2px',
-            color: isSelected ? '#072227' : '#111827'
+            color: '#072227'
           }}
         >
           {value}

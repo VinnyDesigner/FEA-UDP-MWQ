@@ -5,7 +5,7 @@ import logo from '../assets/logo.png';
 const MobileHeader = ({ onMenuClick }) => {
   return (
     <header 
-      className="fixed top-0 left-0 right-0 h-[64px] flex items-center justify-between px-4 z-[1000] lg:hidden"
+      className="fixed top-0 left-0 right-0 h-[64px] flex items-center justify-between px-4 z-[1000] md:hidden"
       style={{
         background: 'linear-gradient(180deg, #072227 0%, #05191D 100%)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
@@ -25,10 +25,8 @@ const MobileHeader = ({ onMenuClick }) => {
         <img src={logo} alt="FEA Logo" className="h-8 object-contain" />
       </div>
 
-      {/* Right: Profile */}
-      <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/80">
-        <User size={20} />
-      </button>
+      {/* Right: Spacer for centering */}
+      <div className="w-10" />
     </header>
   );
 };

@@ -1,289 +1,332 @@
-import React from 'react';
-import { Clock, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, Activity, RefreshCw, Bell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const BuoyStatusCard = ({ activeTab, selectedBuoy, selectedMetric, isMobile = false }) => {
+const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
   const { t } = useTranslation();
-  const isWeather = activeTab === 'Weather';
+  const [isFlipped, setIsFlipped] = useState(false);
+
   const buoyName = selectedBuoy ? selectedBuoy.name : 'AL Aqah Buoy';
-  const updatedTime = selectedBuoy ? selectedBuoy.updated : '2 min ago';
-  const dataInterval = selectedBuoy ? selectedBuoy.interval : (isWeather ? '10 min' : '30 min');
+  const buoyNameKey = selectedBuoy ? selectedBuoy.nameKey : 'alAqah';
+  const updatedTime = selectedBuoy && selectedBuoy.updatedKey ? t(`dashboard.updatedTime.${selectedBuoy.updatedKey}`) : (selectedBuoy ? selectedBuoy.updated : t('dashboard.updatedTime.2min'));
+  const dataInterval = selectedBuoy && selectedBuoy.intervalKey ? t(`dashboard.intervalVal.${selectedBuoy.intervalKey}`) : (selectedBuoy ? selectedBuoy.interval : t('dashboard.intervalVal.30min'));
 
-  const defaultMetric = isWeather ? 'Air Temperature (°c)' : 'Water Temperature (°c)';
-  const currentMetric = selectedMetric || defaultMetric;
-
-  // Extract label and unit
-  const metricParts = currentMetric.split('(');
-  const metricLabel = metricParts[0].trim();
-  const metricUnit = metricParts[1] ? metricParts[1].replace(')', '') : '';
-
-  // Generate pseudo-dynamic value based on metric and buoy
-  const getValue = () => {
-    const seed = (selectedBuoy?.id || 1) + (currentMetric.length || 0);
-    const variation = Math.sin(seed) * 5;
-    
-    const baseValues = {
-      'Water Temperature (°c)': 25.1,
-      'Salinity (ppt)': 36.4,
-      'Chlorophyll (ug)': 1.7,
-      'Dissolved Oxygen (mg/l)': 5.63,
-      'pH': 7.97,
-      'Turbidity (NTU)': 0.02,
-      'Blue-Green Algae (ug)': 0.65,
-      'Depth(m)': 166,
-      'Specific Conductivity(uS)': 12.5,
-      'Air Temperature (°c)': 24.2,
-      'Relative Humidity (%)': 65,
-      'AWS (m/s)': 4.2,
-      'AWD (Degree)': 120,
-      'Wind Gust (Wind Gust)': 6.5,
-      'Pressure (bar)': 1.013
-    };
-
-    const base = baseValues[currentMetric] || 25.0;
-    const value = base + variation;
-    
-    if (currentMetric.includes('pH') || currentMetric.includes('Turbidity') || currentMetric.includes('Algae') || currentMetric.includes('Chlorophyll') || currentMetric.includes('Oxygen')) {
-      return value.toFixed(2);
+  // Dynamic coordinates mapping based on current selected buoy
+  const getBuoyCoordinates = (name) => {
+    switch (name) {
+      case 'Fujairah Buoy 1':
+        return { long: '48.912', lat: '23.402' };
+      case 'Fujairah Buoy 2':
+        return { long: '48.745', lat: '23.315' };
+      case 'Coastal Buoy A':
+        return { long: '48.889', lat: '23.441' };
+      default:
+        return { long: '48.836', lat: '23.371' };
     }
-    if (currentMetric.includes('Temperature') || currentMetric.includes('Salinity') || currentMetric.includes('Conductivity')) {
-      return value.toFixed(1);
-    }
-    return Math.round(value).toString();
   };
 
-  const displayValue = getValue();
-
-  const getMinMax = () => {
-    const val = parseFloat(displayValue);
-    if (isNaN(val)) return { min: '--', max: '--' };
-    
-    const seed = (selectedBuoy?.id || 1) + (currentMetric.length || 0);
-    const variation = Math.abs(Math.cos(seed) * (val * 0.15)); // 15% variation
-    
-    const minVal = Math.max(0, val - variation);
-    const maxVal = val + variation;
-    
-    const precision = displayValue.includes('.') ? displayValue.split('.')[1].length : 0;
-    
-    return {
-      min: minVal.toFixed(precision),
-      max: maxVal.toFixed(precision)
-    };
+  // Dynamic alarm states based on current selected buoy
+  const getAlarmStates = (name) => {
+    switch (name) {
+      case 'Fujairah Buoy 1':
+        return { comm: true, gps: true, door: false }; // True means Normal (Green), False means Alarm (Red)
+      case 'Fujairah Buoy 2':
+        return { comm: true, gps: false, door: true };
+      case 'Coastal Buoy A':
+        return { comm: true, gps: true, door: true };
+      default:
+        return { comm: false, gps: true, door: true }; // AL Aqah Buoy has Comm Status active alarm (Red), other two normal
+    }
   };
 
-  const { min, max } = getMinMax();
+  const coordinates = getBuoyCoordinates(buoyName);
+  const alarms = getAlarmStates(buoyName);
 
-  if (isMobile) {
+  // Common glassmorphic style for Alarm Pills matching filters design
+  const alarmBtnStyle = (isNormal) => ({
+    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    boxShadow: isNormal 
+      ? '0 2px 8px rgba(16, 185, 129, 0.15), inset 0 2px 4px rgba(255,255,255,0.05)' 
+      : '0 4px 12px rgba(239, 68, 68, 0.25), inset 0 2px 4px rgba(255,255,255,0.05)',
+    borderRadius: '30px',
+    padding: '8px 18px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    color: '#FFFFFF',
+    fontSize: '12.5px',
+    fontWeight: '600',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  });
+
+  const renderAlarmIcon = (isNormal) => {
+    if (isNormal) {
+      return (
+        <Bell 
+          size={14} 
+          className="text-[#10B981] drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" 
+          fill="#10B981" 
+        />
+      );
+    }
     return (
-      <>
-        {/* --- MOBILE VERTICAL CARD (< 768px) --- */}
-        <div
-          className="flex md:hidden flex-col flex-shrink-0 z-[1200] relative overflow-y-auto shadow-2xl"
-          style={{
-            width: '100%',
-            height: '220px',
-            borderRadius: '20px',
-            padding: '14px 14px 12px',
-            border: '1px solid rgba(255,255,255,0.08)',
-            backgroundColor: '#00161A'
-          }}
-        >
-          <img 
-            src="/assets/buoy-bg.png" 
-            alt="Background" 
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90"
-          />
-          <div className="flex justify-center relative z-10 mb-0.5">
-            <div className="w-16 h-16 flex items-center justify-center">
-              <img src="/assets/buoy-icon.png" alt="Buoy" className="w-full h-full object-contain drop-shadow-[0_0_16px_rgba(29,205,221,0.5)]" />
-            </div>
-          </div>
-          <div className="flex flex-col items-center z-10 text-center">
-            <p className="text-[11px] text-white/70 mb-0.5">{t('dashboard.locationName')}</p>
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <div className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]" />
-              <p className="text-[18px] font-bold text-white tracking-wide uppercase">{buoyName}</p>
-            </div>
-            <div className="w-full h-[1px] bg-white/10 mb-1" />
-            <p className="text-white/80 text-[12px] mb-0.5">{metricLabel}</p>
-            <div className="flex items-baseline justify-center mb-1">
-              <span className="font-bold leading-none" style={{ fontSize: '36px', color: '#1DCDDD', textShadow: '0 0 24px rgba(29,205,221,0.6)' }}>
-                {displayValue}
-              </span>
-              {metricUnit && (
-                <span className="text-base font-bold text-[#1DCDDD] rtl:mr-1 ltr:ml-1">{metricUnit}</span>
-              )}
-            </div>
-            <div className="flex gap-2 mb-2 justify-center text-[10px] text-white/50">
-              <span>Min: <span className="text-white font-semibold">{min}{metricUnit}</span></span>
-              <span>|</span>
-              <span>Max: <span className="text-white font-semibold">{max}{metricUnit}</span></span>
-            </div>
-            <div className="w-full h-[1px] bg-white/10 mb-2" />
-          </div>
-          <div className="flex items-stretch justify-between z-10">
-            <div className="flex-1 flex flex-col items-center gap-0.5">
-              <div className="flex items-center gap-1.5 text-[10px] text-white/60"><Clock size={12} /><span>{t('dashboard.updated')}</span></div>
-              <span className="text-[13px] font-semibold text-white">{updatedTime}</span>
-            </div>
-            <div className="w-[1px] bg-white/10" />
-            <div className="flex-1 flex flex-col items-center gap-0.5">
-              <div className="flex items-center gap-1.5 text-[10px] text-white/60"><Activity size={12} /><span>{t('dashboard.dataInterval')}</span></div>
-              <span className="text-[13px] font-semibold text-white">{dataInterval}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* --- TABLET HORIZONTAL CARD (768px - 1023px) --- */}
-        <div
-          className="hidden md:flex items-center flex-shrink-0 z-[1200] relative overflow-hidden shadow-2xl"
-          style={{
-            width: '100%',
-            height: '160px',
-            borderRadius: '24px',
-            padding: '20px 24px',
-            border: '1px solid rgba(255,255,255,0.08)',
-            backgroundColor: '#00161A'
-          }}
-        >
-          <img src="/assets/buoy-bg.png" alt="Background" className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90" />
-          
-          {/* Left: Icon */}
-          <div className="relative z-10 w-24 flex-shrink-0">
-            <img src="/assets/buoy-icon.png" alt="Buoy" className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(29,205,221,0.5)]" />
-          </div>
-
-          {/* Center: Content */}
-          <div className="flex-1 flex flex-col items-center z-10 px-6 ltr:border-r rtl:border-l border-white/10">
-            <div className="flex flex-col items-center">
-              <p className="text-[14px] text-white/60">{t('dashboard.locationName')}</p>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
-                <p className="text-[28px] font-bold text-white tracking-wide uppercase">{buoyName}</p>
-              </div>
-            </div>
-            
-            <div className="w-full h-[1px] bg-white/10 my-2" />
-
-            <div className="flex items-center gap-6">
-              <p className="text-white/80 text-[16px]">{metricLabel}</p>
-              <div className="flex items-baseline gap-4">
-                <div className="flex items-baseline">
-                  <span className="font-bold" style={{ fontSize: '48px', color: '#1DCDDD', textShadow: '0 0 30px rgba(29,205,221,0.6)' }}>
-                    {displayValue}
-                  </span>
-                  {metricUnit && (
-                    <span className="text-2xl font-bold text-[#1DCDDD] rtl:mr-1 ltr:ml-1">{metricUnit}</span>
-                  )}
-                </div>
-                <div className="flex flex-col text-xs text-white/60">
-                  <span>Min: <span className="text-white font-semibold">{min}{metricUnit}</span></span>
-                  <span>Max: <span className="text-white font-semibold">{max}{metricUnit}</span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Info Section */}
-          <div className="w-48 flex-shrink-0 flex flex-col justify-center gap-4 ltr:pl-6 rtl:pr-6 z-10">
-            <div className="flex items-center gap-3">
-              <Clock size={18} className="text-white/60" />
-              <div className="flex flex-col">
-                <span className="text-[12px] text-white/60">{t('dashboard.updated')}</span>
-                <span className="text-[15px] font-semibold text-white leading-tight">{updatedTime}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Activity size={18} className="text-white/60" />
-              <div className="flex flex-col">
-                <span className="text-[12px] text-white/60">{t('dashboard.dataInterval')}</span>
-                <span className="text-[15px] font-semibold text-white leading-tight">{dataInterval}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
+      <div className="relative flex items-center justify-center">
+        <Bell 
+          size={14} 
+          className="text-[#EF4444] drop-shadow-[0_0_8px_rgba(239,68,68,0.9)] animate-bounce" 
+          fill="#EF4444" 
+        />
+      </div>
     );
-  }
+  };
 
-  // --- DESKTOP RENDER ---
-  return (
-    <div
-      className="flex flex-col flex-shrink-0 z-[1200] relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-      style={{
-        width: '100%',
-        height: '100%',
-        borderRadius: '28px',
-        padding: '24px',
-        border: '1px solid rgba(255,255,255,0.05)',
-        backgroundColor: '#00161A'
-      }}
-    >
-      {/* Background Image */}
+  const renderAlarmPills = () => (
+    <div className="flex flex-col items-center w-full z-10">
+      <div className="flex gap-3 mb-3 justify-center w-full max-w-[340px]">
+        {/* Comm Status Pill */}
+        <div className="flex-1 flex justify-center min-w-0">
+          <button style={alarmBtnStyle(alarms.comm)} className="w-full truncate hover:scale-[1.02] active:scale-[0.98] outline-none">
+            {renderAlarmIcon(alarms.comm)}
+            <span className="truncate">{t('dashboard.commStatus')}</span>
+          </button>
+        </div>
+        
+        {/* GPS Alarm Pill */}
+        <div className="flex-1 flex justify-center min-w-0">
+          <button style={alarmBtnStyle(alarms.gps)} className="w-full truncate hover:scale-[1.02] active:scale-[0.98] outline-none">
+            {renderAlarmIcon(alarms.gps)}
+            <span className="truncate">{t('dashboard.gpsAlarm')}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Enclosure Door Open Pill */}
+      <div className="flex justify-center w-full mb-3 max-w-[340px]">
+        <button style={alarmBtnStyle(alarms.door)} className="w-[85%] hover:scale-[1.02] active:scale-[0.98] outline-none">
+          {renderAlarmIcon(alarms.door)}
+          <span className="truncate">{t('dashboard.enclosureDoorOpen')}</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  // 3D Card Flip CSS Classes & Inline Styles
+  const containerStyle = {
+    perspective: '1000px',
+    width: '100%',
+    height: '100%',
+    minHeight: isMobile ? '420px' : '100%',
+    position: 'relative',
+  };
+
+  const cardInnerStyle = {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+    transformStyle: 'preserve-3d',
+    transform: isFlipped ? 'rotateY(180deg)' : 'none',
+  };
+
+  const faceStyle = {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    backfaceVisibility: 'hidden',
+    WebkitBackfaceVisibility: 'hidden',
+    borderRadius: '28px',
+    overflow: 'hidden',
+    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+  };
+
+  const backFaceStyle = {
+    ...faceStyle,
+    transform: 'rotateY(180deg)',
+    backgroundColor: '#00161A',
+  };
+
+  const renderBackFace = (cardHeightClass) => (
+    <div style={backFaceStyle} className={`relative flex flex-col justify-center items-center ${cardHeightClass}`}>
+      {/* Real Buoy Photograph Background */}
       <img 
-        src="/assets/buoy-bg.png" 
-        alt="Background" 
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90"
+        src="/assets/buoy-real.jpg" 
+        alt="Real Buoy Photograph" 
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+      />
+      {/* Dark overlay gradient for pristine text readability */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.75) 100%)'
+        }}
       />
 
-      {/* Top: Buoy Illustration */}
-      <div className="flex justify-center relative z-10 mb-3 mt-1">
-        <div className="w-32 h-32 flex items-center justify-center">
-          <img 
-            src="/assets/buoy-icon.png" 
-            alt="Buoy Illustration" 
-            className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(29,205,221,0.4)]" 
-          />
-        </div>
+      {/* Printer/Flip Icon in Top Right - Raw White Icon to match mockup exactly */}
+      <button 
+        onClick={(e) => { e.stopPropagation(); setIsFlipped(false); }}
+        className="absolute top-6 right-6 z-20 text-white/90 hover:text-white hover:scale-105 active:scale-95 transition-all outline-none bg-transparent border-0 cursor-pointer"
+      >
+        <RefreshCw size={20} className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:rotate-180" />
+      </button>
+
+      {/* Location Details Centered at the Bottom - Perfect replication of attached image */}
+      <div className="absolute bottom-8 left-0 right-0 z-10 flex flex-col items-center text-center px-4">
+        <h2 className="text-[32px] font-bold text-white tracking-wide flex items-center justify-center gap-2.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
+          <span className="w-3.5 h-3.5 rounded-full bg-[#10B981] shadow-[0_0_12px_#10B981] inline-block animate-pulse" />
+          {t(`stations.${buoyNameKey}`)}
+        </h2>
       </div>
+    </div>
+  );
 
-      <div className="flex flex-col items-center flex-1 z-10">
-        <p className="text-[12px] text-white/60 mb-1">{t('dashboard.locationName')}</p>
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
-          <p className="text-2xl font-bold text-white tracking-wide">{buoyName}</p>
-        </div>
+  return (
+    <div style={containerStyle}>
+      <div style={cardInnerStyle}>
+        
+        {/* ====================================================
+            FRONT FACE (All responsive breakpoints)
+           ==================================================== */}
+        <div style={faceStyle} className="bg-[#00161A]">
+          
+          {/* MOBILE RENDER */}
+          {isMobile && (
+            <div
+              className="flex md:hidden flex-col w-full h-full relative"
+              style={{
+                padding: '24px 20px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '28px',
+              }}
+            >
+              <img 
+                src="/assets/buoy-bg.png" 
+                alt="Background" 
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90"
+              />
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
+                className="absolute top-5 right-5 z-20 text-white/80 hover:text-white hover:scale-105 active:scale-95 transition-all outline-none bg-transparent border-0 cursor-pointer"
+              >
+                <RefreshCw size={20} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:rotate-180" />
+              </button>
 
-        <p className="text-white/60 font-medium text-[12px] mb-1">
-          {metricLabel}
-        </p>
-        <div className="flex items-start justify-center">
-          <span 
-            className="font-black leading-none tracking-tighter"
-            style={{ 
-              fontSize: '72px', 
-              color: '#1DCDDD', 
-              textShadow: '0 0 30px rgba(29,205,221,0.6)' 
-            }}
-          >
-            {displayValue}
-          </span>
-          {metricUnit && (
-            <span className="text-4xl mt-2 font-bold text-[#1DCDDD]" style={{ textShadow: '0 0 20px rgba(29,205,221,0.5)' }}>{metricUnit}</span>
+              <div className="flex justify-center relative z-10 mb-4 mt-2">
+                <div className="w-24 h-24 flex items-center justify-center">
+                  <img 
+                    src="/assets/buoy-icon.png" 
+                    alt="Buoy Illustration" 
+                    className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(29,205,221,0.4)]" 
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center z-10 text-center mb-4">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981] animate-pulse" />
+                  <p className="text-[20px] font-bold text-white tracking-wide">{t(`stations.${buoyNameKey}`)}</p>
+                </div>
+                <div 
+                  className="px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-3 text-[11px] text-white/80 font-medium"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    backdropFilter: 'blur(4px)'
+                  }}
+                >
+                  <span>{t('dashboard.longitude')}: {coordinates.long}</span>
+                  <span>{t('dashboard.latitude')}: {coordinates.lat}</span>
+                </div>
+              </div>
+
+              {renderAlarmPills()}
+
+              <div className="flex justify-between items-center z-10 pt-3 border-t border-white/10 mt-auto">
+                <div className="flex items-center gap-1.5 text-[10px] text-white/60">
+                  <Clock size={12} />
+                  <span>{t('dashboard.updated')} {updatedTime}</span>
+                </div>
+                <span className="text-[10px] text-white/60">
+                  {t('dashboard.dataInterval')}: {dataInterval}
+                </span>
+              </div>
+            </div>
           )}
+
+          {/* DESKTOP & TABLET RENDER (Unified beautiful vertical layout) */}
+          {!isMobile && (
+            <div
+              className="flex flex-col w-full h-full relative"
+              style={{
+                padding: '24px',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '28px',
+              }}
+            >
+              <img 
+                src="/assets/buoy-bg.png" 
+                alt="Background" 
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90"
+              />
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
+                className="absolute top-6 right-6 z-20 text-white/80 hover:text-white hover:scale-105 active:scale-95 transition-all outline-none bg-transparent border-0 cursor-pointer"
+              >
+                <RefreshCw size={20} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:rotate-180" />
+              </button>
+
+              <div className="flex justify-center relative z-10 mb-4 mt-6">
+                <div className="w-32 h-32 flex items-center justify-center">
+                  <img 
+                    src="/assets/buoy-icon.png" 
+                    alt="Buoy Illustration" 
+                    className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(29,205,221,0.4)]" 
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center z-10 text-center mb-8">
+                <div className="flex items-center justify-center gap-2.5 mb-4">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_10px_#10B981] animate-pulse" />
+                  <h2 className="text-3xl font-extrabold text-white tracking-wide">{t(`stations.${buoyNameKey}`)}</h2>
+                </div>
+                <div 
+                  className="px-5 py-1.5 rounded-full border border-white/10 flex items-center gap-4 text-[12.5px] text-white/85 font-medium shadow-inner"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    backdropFilter: 'blur(4px)'
+                  }}
+                >
+                  <span>{t('dashboard.longitude')}: {coordinates.long}</span>
+                  <span>{t('dashboard.latitude')}: {coordinates.lat}</span>
+                </div>
+              </div>
+
+              {renderAlarmPills()}
+
+              <div className="flex justify-between items-center z-10 pt-4 border-t border-white/10 mt-auto">
+                <div className="flex items-center gap-1.5 text-[11.5px] text-white/60">
+                  <Clock size={13} />
+                  <span>{t('dashboard.updated')} {updatedTime}</span>
+                </div>
+                <span className="text-[11.5px] text-white/60">
+                  {t('dashboard.dataInterval')}: {dataInterval}
+                </span>
+              </div>
+            </div>
+          )}
+
         </div>
 
-        <div className="flex gap-4 mt-1 justify-center">
-          <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
-            <span className="text-[10px] text-white/50 uppercase">Min</span>
-            <span className="text-xs font-semibold text-white">{min}{metricUnit}</span>
-          </div>
-          <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
-            <span className="text-[10px] text-white/50 uppercase">Max</span>
-            <span className="text-xs font-semibold text-white">{max}{metricUnit}</span>
-          </div>
-        </div>
-      </div>
+        {/* ====================================================
+            BACK FACE (All responsive breakpoints)
+           ==================================================== */}
+        {renderBackFace('w-full h-full')}
 
-      <div className="flex justify-between items-center z-10 pt-3 border-t border-white/10 mt-auto pt-4">
-        <div className="flex items-center gap-1.5 text-[11px] text-white/60">
-          <Clock size={12} />
-          <span>{t('dashboard.updated')} {updatedTime}</span>
-        </div>
-        <span className="text-[11px] text-white/60">
-          {t('dashboard.interval')}:{dataInterval}
-        </span>
       </div>
     </div>
   );

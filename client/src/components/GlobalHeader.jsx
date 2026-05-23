@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import logo from '../assets/logo.png';
+import logoWide from '../assets/logo.png';
+import logoEmblem from '../assets/logo-auth.png';
 
 const GlobalHeader = () => {
   const { t, i18n } = useTranslation();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  const isMobile = windowWidth < 768;
 
   const handleLanguageToggle = (lang) => {
     i18n.changeLanguage(lang);
@@ -11,19 +22,34 @@ const GlobalHeader = () => {
 
   return (
     <header 
-      className="flex items-center justify-between w-full h-[80px] px-[30px] z-50 absolute top-0 left-0 right-0 pointer-events-auto bg-transparent"
+      className="flex items-center justify-between w-full h-[80px] pl-[16px] pr-[30px] z-50 absolute top-0 left-0 right-0 pointer-events-auto bg-transparent"
     >
       {/* Left: Logo */}
       <div className="flex items-center w-1/4">
-        <div className="h-12 flex items-center justify-start">
-          <img src={logo} alt="Fujairah Environment Authority Logo" className="h-full object-contain" />
+        <div className="flex items-center justify-start" style={{ height: '84px' }}>
+          {isTablet ? (
+            /* Circular Emblem Logo - Only visible in Tab responsive design (tablet) */
+            <img 
+              src={logoEmblem} 
+              alt="Fujairah Environment Authority Emblem" 
+              className="h-[54px] w-[54px] object-cover object-left" 
+              style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.4))' }}
+            />
+          ) : !isMobile ? (
+            /* Full Wide Bilingual Logo - Only visible on Desktop */
+            <img 
+              src={logoWide} 
+              alt="Fujairah Environment Authority Logo" 
+              className="w-[317px] h-[84px] object-contain" 
+            />
+          ) : null}
         </div>
       </div>
 
       {/* Center: Title */}
       <div className="flex flex-col items-center justify-center w-2/4 text-center">
-        <h1 className="text-[20px] font-bold text-white tracking-wide" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
-          Marine Water Quality Monitoring Dashboard
+        <h1 className="font-bold text-white tracking-wide" style={{ fontSize: '24px', lineHeight: '1.1', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+          {t('dashboard.title')}
         </h1>
       </div>
 

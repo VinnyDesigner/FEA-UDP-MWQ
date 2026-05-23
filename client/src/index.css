@@ -57,6 +57,18 @@ body {
 }
 .panel-chart-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(0,159,172,0.35) transparent; }
 
+/* ── Analytics Panel Scrollbar ── */
+.analytics-panel-scroll::-webkit-scrollbar { width: 4px; }
+.analytics-panel-scroll::-webkit-scrollbar-track { background: transparent; }
+.analytics-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 159, 172, 0.35);
+  border-radius: 4px;
+}
+.analytics-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 159, 172, 0.6);
+}
+.analytics-panel-scroll { scrollbar-width: thin; scrollbar-color: rgba(0,159,172,0.35) transparent; }
+
 /* Scrollbar Hide Utility */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */

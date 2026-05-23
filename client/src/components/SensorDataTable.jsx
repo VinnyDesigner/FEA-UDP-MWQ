@@ -61,13 +61,89 @@ const sensorData = [
   }
 ];
 
-const SensorDataTable = ({ isMobile = false, selectedBuoy = 'Al Aqah New' }) => {
+const paramDefs = [
+  { filterName: 'Specific Conductivity', key: 'conductivity', label: 'dashboard.specificConductivity' },
+  { filterName: 'Water Temperature', key: 'temp', label: 'dashboard.waterTemperature', suffix: '°C' },
+  { filterName: 'Salinity', key: 'salinity', label: 'dashboard.salinity' },
+  { filterName: 'Chlorophyll', key: 'chlorophyll', label: 'dashboard.chlorophyll' },
+  { filterName: 'Oxygen Saturation', key: 'oxygenSat', label: 'analytics.oxygenSaturation', suffix: '%' },
+  { filterName: 'Dissolved Oxygen', key: 'dissolvedOxygen', label: 'dashboard.dissolvedOxygen' },
+  { filterName: 'Turbidity', key: 'turbidity', label: 'dashboard.turbidity' },
+  { filterName: 'pH', key: 'ph', label: 'dashboard.ph' },
+  { filterName: 'Depth', key: 'depth', label: 'dashboard.depth', suffix: 'm' },
+  { filterName: 'Bluegreen Algae', key: 'algae', label: 'dashboard.blueGreenAlgae' },
+  { filterName: 'Blue-Green Algae', key: 'algae', label: 'dashboard.blueGreenAlgae' }
+];
+
+const SensorDataTable = ({ 
+  isMobile = false, 
+  selectedBuoy = 'Al Aqah Buoy', 
+  selectedParams = [], 
+  selectedDuration = 'Last Day',
+  isGraphAndTableView = false
+}) => {
   const { t } = useTranslation();
+  const [scrollLeft, setScrollLeft] = React.useState(0);
+  const [scrollTop, setScrollTop] = React.useState(0);
+
+  const handleScroll = (e) => {
+    setScrollLeft(e.currentTarget.scrollLeft);
+    setScrollTop(e.currentTarget.scrollTop);
+  };
+
+  const getFilteredData = () => {
+    const activeBuoys = Array.isArray(selectedBuoy) ? selectedBuoy : [selectedBuoy];
+
+    const getBuoyMultiplier = (buoyName) => {
+      if (buoyName === 'Near Shore Buoy') return 0.85;
+      if (buoyName === 'Offshore Buoy') return 1.15;
+      if (buoyName === 'North Dibbah') return 0.95;
+      return 1.0;
+    };
+
+    let allProcessed = [];
+
+    activeBuoys.forEach((buoy) => {
+      const multiplier = getBuoyMultiplier(buoy);
+      const buoyProcessed = sensorData.map(row => {
+        const newRow = { ...row, station: buoy };
+        paramDefs.forEach(param => {
+          if (row[param.key]) {
+            const val = parseFloat(row[param.key]);
+            if (!isNaN(val)) {
+              newRow[param.key] = (val * multiplier).toFixed(2);
+            }
+          }
+        });
+        return newRow;
+      });
+      allProcessed.push(...buoyProcessed);
+    });
+
+    if (selectedDuration === 'Live Data' || selectedDuration === 'Last Day') {
+      // Return all 4 points or duplicate to ensure scrolling is fully functional
+      return [...allProcessed, ...allProcessed.map(r => ({ ...r, dateTime: r.dateTime.replace('17-02-2026', '16-02-2026') }))];
+    } else if (selectedDuration === 'Last Week' || selectedDuration === 'Last Month' || selectedDuration === 'Last Three Months') {
+      return [...allProcessed, ...allProcessed.map(r => ({ ...r, dateTime: r.dateTime.replace('17-02-2026', '15-02-2026') }))];
+    }
+    return allProcessed;
+  };
+
+  const displayedData = getFilteredData();
+
+  const activeParams = selectedParams && selectedParams.length > 0
+    ? paramDefs.filter(def => selectedParams.includes(def.filterName))
+    : paramDefs.filter((def, index, self) => self.findIndex(d => d.key === def.key) === index);
+
+  const rowHeightClass = isGraphAndTableView ? 'h-[36px]' : 'h-[50px]';
+  const cellPaddingClass = isGraphAndTableView ? 'px-4 py-1.5' : 'px-5 py-3';
+  const headerBgClass = isGraphAndTableView ? 'backdrop-blur-md bg-[#1a4a4e]/40' : 'bg-transparent';
+
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className={`flex-1 flex flex-col min-h-0 ${isGraphAndTableView ? 'overflow-hidden' : ''}`}>
       {/* --- MOBILE VIEW: Sensor Data Cards (< 768px) --- */}
       <div className="flex md:hidden flex-col gap-4 w-full">
-        {sensorData.map((row, index) => (
+        {displayedData.map((row, index) => (
           <div 
             key={index} 
             className="flex flex-col gap-[14px] p-[18px] relative overflow-hidden"
@@ -79,211 +155,205 @@ const SensorDataTable = ({ isMobile = false, selectedBuoy = 'Al Aqah New' }) => 
               boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
             }}
           >
-            {/* Header: Station & Time */}
+            {/* Header: Time + Location */}
             <div className="flex flex-col gap-2 pb-3 border-b border-white/10">
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.station')}</span>
-                <span className="text-[18px] font-bold text-white">{selectedBuoy}</span>
-              </div>
               <div className="flex flex-col">
                 <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.dateTime')}</span>
                 <span className="text-[15px] font-semibold text-[#1DCDDD]">{row.dateTime}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[12px] font-medium text-white/50 uppercase tracking-wide">{t('analytics.location', 'Location')}</span>
+                <span className="text-[15px] font-semibold text-white/90">{row.station}</span>
               </div>
             </div>
 
             {/* Parameter Grid */}
             <div className="grid grid-cols-2 gap-y-4 gap-x-6">
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.specificConductivity')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.conductivity}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.waterTemperature')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.temp}°C</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.salinity')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.salinity}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.chlorophyll')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.chlorophyll}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('analytics.oxygenSaturation')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.oxygenSat}%</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.dissolvedOxygen')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.dissolvedOxygen}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.turbidity')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.turbidity}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.ph')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.ph}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.depth')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.depth}m</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[12px] font-medium text-white/60">{t('dashboard.blueGreenAlgae')}</span>
-                <span className="text-[16px] font-bold text-white/90">{row.algae}</span>
-              </div>
+              {activeParams.map((param, idx) => {
+                const value = row[param.key];
+                const displayValue = param.suffix ? `${value}${param.suffix}` : value;
+                return (
+                  <div key={idx} className="flex flex-col">
+                    <span className="text-[12px] font-medium text-white/60">{t(param.label)}</span>
+                    <span className="text-[16px] font-bold text-white/90">{displayValue}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}
       </div>
 
       {/* --- TABLET/DESKTOP VIEW: Table (>= 768px) --- */}
-      <div className="hidden md:flex flex-1 flex-col min-h-0">
-        <div className="flex-1 flex min-h-0 mb-4">
-          
-          {/* 1. Left Fixed Column */}
-          <div className="flex-shrink-0 flex flex-col border-r border-white/10 w-[180px]">
-            <div className="px-6 py-3 text-white text-[14px] font-bold border-b border-white/10 flex items-center gap-2 h-[50px] leading-tight sticky top-0 z-10 bg-transparent">
-              {t('analytics.stationName')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
-            </div>
-            <div className="flex-1">
-              {sensorData.map((row, index) => (
-                <div key={index} className="px-6 py-3 text-white/90 text-[14px] font-bold border-b border-white/10 h-[50px] flex items-center whitespace-nowrap">
-                  {selectedBuoy}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 2. Middle Scrollable Columns - Table Auto for dynamic width */}
-          <div className="flex-1 overflow-x-auto custom-scrollbar flex flex-col min-w-0">
-            <style dangerouslySetInnerHTML={{__html: `
-              .custom-scrollbar::-webkit-scrollbar {
-                height: 6px;
-              }
-              .custom-scrollbar::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.02);
-                border-radius: 10px;
-              }
-              .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(29, 205, 221, 0.2);
-                border-radius: 10px;
-                transition: all 0.3s ease;
-              }
-              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(29, 205, 221, 0.4);
-              }
-            `}} />
-            <table className="w-full border-collapse table-auto">
-              <thead>
-                <tr className="border-b border-white/10 h-[50px]">
-                  {[
-                    t('analytics.dateTime'),
-                    t('dashboard.specificConductivity'),
-                    t('dashboard.waterTemperature'),
-                    t('dashboard.salinity'),
-                    t('dashboard.chlorophyll'),
-                    t('analytics.oxygenSaturation'),
-                    t('dashboard.dissolvedOxygen'),
-                    t('dashboard.turbidity'),
-                    t('dashboard.ph'),
-                    t('dashboard.depth')
-                  ].map((label, idx) => (
-                    <th key={idx} className="px-6 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 z-10 bg-transparent">
-                      <div className="flex items-center gap-2">
-                        {label} <ArrowUpDown size={14} className="flex-shrink-0 text-white/60" />
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sensorData.map((row, index) => (
-                  <tr key={index} className="border-b border-white/10 h-[50px] hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap font-medium">{row.dateTime}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.conductivity}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.temp}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.salinity}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.chlorophyll}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.oxygenSat}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.dissolvedOxygen}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.turbidity}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.ph}</td>
-                    <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.depth}</td>
-                  </tr>
+      <div className={`hidden md:flex flex-1 flex-col min-h-0 ${isGraphAndTableView ? 'overflow-hidden' : ''}`}>
+        <div 
+          className={`flex-1 overflow-auto custom-scrollbar relative ${isGraphAndTableView ? 'mb-0' : 'mb-4'}`}
+          onScroll={handleScroll}
+          style={{
+            borderRadius: '12px',
+            background: 'radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.14) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0, 0, 0, 0.10)',
+          }}
+        >
+          <style dangerouslySetInnerHTML={{__html: `
+            .custom-scrollbar::-webkit-scrollbar {
+              height: 6px;
+              width: 6px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+              background: rgba(255, 255, 255, 0.02);
+              border-radius: 10px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+              background: rgba(29, 205, 221, 0.2);
+              border-radius: 10px;
+              transition: all 0.3s ease;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+              background: rgba(29, 205, 221, 0.4);
+            }
+          `}} />
+          <table className="w-full border-collapse table-auto">
+            <thead>
+              <tr className={`border-b border-white/10 ${rowHeightClass}`}>
+                {/* Sticky Column 1 Header (Date & Time) */}
+                <th 
+                  className="px-5 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 left-0 z-30 w-[180px] min-w-[180px] border-b border-white/10"
+                  style={{
+                    background: (scrollTop > 0 || scrollLeft > 0) ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                    backdropFilter: (scrollTop > 0 || scrollLeft > 0) ? 'blur(20px)' : 'none',
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    {t('analytics.dateTime')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
+                  </div>
+                </th>
+                {/* Sticky Column 2 Header (Location / Station Name) */}
+                <th 
+                  className="px-5 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 left-[180px] z-30 w-[150px] min-w-[150px] border-b border-white/10"
+                  style={{
+                    background: (scrollTop > 0 || scrollLeft > 0) ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                    backdropFilter: (scrollTop > 0 || scrollLeft > 0) ? 'blur(20px)' : 'none',
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    {t('analytics.location', 'Station Name')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
+                  </div>
+                </th>
+                {/* Scrollable Parameter Headers */}
+                {activeParams.map((param, idx) => (
+                  <th 
+                    key={idx} 
+                    className="px-6 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 z-20 border-b border-white/10"
+                    style={{
+                      background: scrollTop > 0 ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                      backdropFilter: scrollTop > 0 ? 'blur(20px)' : 'none',
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      {t(param.label)} <ArrowUpDown size={14} className="flex-shrink-0 text-white/60" />
+                    </div>
+                  </th>
                 ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* 3. Right Fixed Column */}
-          <div className="flex-shrink-0 flex flex-col border-l border-white/10 w-[180px]">
-            <div className="px-6 py-3 text-white text-[14px] font-bold border-b border-white/10 flex items-center gap-2 h-[50px] leading-tight sticky top-0 z-10 bg-transparent">
-              {t('dashboard.blueGreenAlgae')} <ArrowUpDown size={14} className="text-white/60 flex-shrink-0" />
-            </div>
-            <div className="flex-1">
-              {sensorData.map((row, index) => (
-                <div key={index} className="px-6 py-3 text-white/90 text-[14px] border-b border-white/10 h-[50px] flex items-center">
-                  {row.algae}
-                </div>
+              </tr>
+            </thead>
+            <tbody>
+              {displayedData.map((row, index) => (
+                <tr key={index} className={`border-b border-white/10 hover:bg-white/5 transition-colors ${rowHeightClass}`}>
+                  {/* Sticky Column 1 Cell (Date & Time) */}
+                  <td 
+                    className="px-5 py-3 text-white/90 text-[14px] font-bold whitespace-nowrap sticky left-0 z-10 w-[180px] min-w-[180px] border-b border-white/10"
+                    style={{
+                      background: scrollLeft > 0 ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                      backdropFilter: scrollLeft > 0 ? 'blur(20px)' : 'none',
+                    }}
+                  >
+                    {row.dateTime}
+                  </td>
+                  {/* Sticky Column 2 Cell (Location / Station Name) */}
+                  <td 
+                    className="px-5 py-3 text-white/90 text-[14px] font-bold whitespace-nowrap sticky left-[180px] z-10 w-[150px] min-w-[150px] border-b border-white/10"
+                    style={{
+                      background: scrollLeft > 0 ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                      backdropFilter: scrollLeft > 0 ? 'blur(20px)' : 'none',
+                    }}
+                  >
+                    {row.station}
+                  </td>
+                  {/* Parameter Cells */}
+                  {activeParams.map((param, idx) => {
+                    const value = row[param.key];
+                    const displayValue = param.suffix ? `${value}${param.suffix}` : value;
+                    return (
+                      <td 
+                        key={idx} 
+                        className={`px-6 py-3 text-white/90 text-[14px] whitespace-nowrap border-b border-white/10 ${cellPaddingClass}`}
+                      >
+                        {displayValue}
+                      </td>
+                    );
+                  })}
+                </tr>
               ))}
-            </div>
-          </div>
+            </tbody>
+          </table>
         </div>
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex justify-end items-center gap-2 mt-auto pt-6 pb-3">
-        <button 
-          className="w-10 h-10 flex items-center justify-center transition-all hover:brightness-110 active:scale-95"
-          style={{
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.30)',
-            background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
-            boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
-            color: '#FFFFFF'
-          }}
-        >
-          <ChevronLeft size={18} className="rtl:rotate-180" />
-        </button>
-        {[1, 2, 3, 4, 5].map((page) => (
+      {!isGraphAndTableView && (
+        <div className="flex justify-end items-center gap-2 mt-auto pt-6 pb-3">
           <button 
-            key={page}
-            className="w-10 h-10 flex items-center justify-center text-[14px] font-bold transition-all hover:brightness-110 active:scale-95 shadow-lg"
-            style={
-              page === 1 
-                ? {
-                    borderRadius: '12px',
-                    background: '#BBE6E9',
-                    boxShadow: '0 4px 4px 0 rgba(0, 0, 0, 0.25) inset',
-                    color: '#000000',
-                  }
-                : {
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.30)',
-                    background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
-                    boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
-                    color: '#FFFFFF',
-                  }
-            }
+            className="w-10 h-10 flex items-center justify-center transition-all hover:brightness-110 active:scale-95"
+            style={{
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 255, 255, 0.30)',
+              background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
+              boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
+              color: '#FFFFFF'
+            }}
           >
-            {page}
+            <ChevronLeft size={18} className="rtl:rotate-180" />
           </button>
-        ))}
-        <button 
-          className="w-10 h-10 flex items-center justify-center transition-all hover:brightness-110 active:scale-95"
-          style={{
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.30)',
-            background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
-            boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
-            color: '#FFFFFF'
-          }}
-        >
-          <ChevronRight size={18} className="rtl:rotate-180" />
-        </button>
-      </div>
+          {[1, 2, 3, 4, 5].map((page) => (
+            <button 
+              key={page}
+              className="w-10 h-10 flex items-center justify-center text-[14px] font-bold transition-all hover:brightness-110 active:scale-95 shadow-lg"
+              style={
+                page === 1 
+                  ? {
+                      borderRadius: '12px',
+                      background: '#BBE6E9',
+                      boxShadow: '0 4px 4px 0 rgba(0, 0, 0, 0.25) inset',
+                      color: '#000000',
+                    }
+                  : {
+                      borderRadius: '12px',
+                      border: '1px solid rgba(255, 255, 255, 0.30)',
+                      background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                      boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
+                      color: '#FFFFFF',
+                    }
+              }
+            >
+              {page}
+            </button>
+          ))}
+          <button 
+            className="w-10 h-10 flex items-center justify-center transition-all hover:brightness-110 active:scale-95"
+            style={{
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 255, 255, 0.30)',
+              background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
+              boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
+              color: '#FFFFFF'
+            }}
+          >
+            <ChevronRight size={18} className="rtl:rotate-180" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

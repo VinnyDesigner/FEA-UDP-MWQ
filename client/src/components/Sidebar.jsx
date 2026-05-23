@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { User, LogOut } from 'lucide-react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +15,40 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('My Profile');
+  const [profilePos, setProfilePos] = useState({ top: 0, left: 0 });
+
+  const profileBtnRef = useRef(null);
+  const profileDropdownRef = useRef(null);
+
+  const toggleProfileDropdown = () => {
+    if (!isProfileOpen && profileBtnRef.current) {
+      const rect = profileBtnRef.current.getBoundingClientRect();
+      setProfilePos({
+        top: rect.top + window.scrollY - 30, // Positioned matching mockup height level
+        left: rect.right + window.scrollX + 12 // Positioned to the right of the sidebar
+      });
+    }
+    setIsProfileOpen(!isProfileOpen);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isProfileOpen &&
+        profileBtnRef.current &&
+        !profileBtnRef.current.contains(event.target) &&
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileOpen]);
+
   const pillStyle = {
     borderRadius: '40px',
     border: '1px solid rgba(0, 0, 0, 0.10)',
@@ -23,9 +58,20 @@ const Sidebar = () => {
     width: '60px',
   };
 
+  // Glassmorphic dropdown styling matching filters modal
+  const glassDropdownStyle = {
+    borderRadius: '21px',
+    border: '1px solid rgba(0, 0, 0, 0.10)',
+    background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
+    backdropFilter: 'blur(25px)',
+    WebkitBackdropFilter: 'blur(25px)',
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)',
+    width: '230px',
+  };
+
   return (
     <aside 
-      className="hidden md:flex w-[80px] min-w-[80px] flex-col items-center pb-[8px] flex-shrink-0 z-[1100] pointer-events-auto bg-transparent fixed left-0 top-[80px] bottom-0 gap-6" 
+      className="hidden md:flex w-[92px] min-w-[92px] flex-col items-center pb-[8px] flex-shrink-0 z-[1100] pointer-events-auto bg-transparent fixed left-0 top-[80px] bottom-0 gap-6" 
       style={{ height: 'calc(100vh - 80px)' }}
     >
       
@@ -81,8 +127,10 @@ const Sidebar = () => {
           </span>
         </button>
 
-        {/* User Profile */}
+        {/* User Profile Trigger Button */}
         <button
+          ref={profileBtnRef}
+          onClick={toggleProfileDropdown}
           title={t('nav.userProfile') || 'Profile'}
           className="flex items-center justify-center transition-all w-[42px] h-[42px] group relative"
           style={{
@@ -98,9 +146,62 @@ const Sidebar = () => {
           </span>
         </button>
       </div>
+
+      {/* Profile Dropdown Options Card Portal */}
+      {isProfileOpen && createPortal(
+        <div 
+          ref={profileDropdownRef}
+          className="fixed z-[9999] p-5 flex flex-col gap-4"
+          style={{
+            ...glassDropdownStyle,
+            top: profilePos.top,
+            left: profilePos.left
+          }}
+        >
+          <div className="flex flex-col gap-4">
+            {/* Option 1: My Profile */}
+            <button
+              onClick={() => {
+                setSelectedOption('My Profile');
+                setIsProfileOpen(false);
+                navigate('/profile');
+              }}
+              className="flex items-center gap-3.5 text-left outline-none cursor-pointer group"
+            >
+              <div 
+                className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center transition-all ${
+                  selectedOption === 'My Profile' ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                }`}
+              >
+                {selectedOption === 'My Profile' && <div className="w-[8px] h-[8px] bg-[#009FAC] rounded-full" />}
+              </div>
+              <span className="text-white text-[14.5px] font-semibold leading-none">{t('nav.myProfile')}</span>
+            </button>
+
+            {/* Option 2: User Management */}
+            <button
+              onClick={() => {
+                setSelectedOption('User Management');
+                setIsProfileOpen(false);
+                navigate('/user-management');
+              }}
+              className="flex items-center gap-3.5 text-left outline-none cursor-pointer group"
+            >
+              <div 
+                className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center transition-all ${
+                  selectedOption === 'User Management' ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                }`}
+              >
+                {selectedOption === 'User Management' && <div className="w-[8px] h-[8px] bg-[#009FAC] rounded-full" />}
+              </div>
+              <span className="text-white text-[14.5px] font-semibold leading-none">{t('nav.userManagement')}</span>
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
     </aside>
   );
 };
 
 export default Sidebar;
-

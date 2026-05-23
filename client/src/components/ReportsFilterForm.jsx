@@ -5,28 +5,70 @@ import { useTranslation } from 'react-i18next';
 
 const ReportsFilterForm = () => {
   const { t } = useTranslation();
+  
   const initialState = {
     station: 'Al Aqah New',
     monitoringType: 'Sonde Information',
-    parameter: 'Blue Green Algae',
-    type: 'Raw',
+    parameter: 'Blue-Green Algae',
     startDate: '2026-01-01',
     endDate: '2026-01-30'
   };
 
   const [formData, setFormData] = useState(initialState);
-  const [isStationOpen, setIsStationOpen] = useState(false);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
   
+  // Dropdown visibility states
+  const [isStationOpen, setIsStationOpen] = useState(false);
+  const [isMonitoringTypeOpen, setIsMonitoringTypeOpen] = useState(false);
+  const [isParameterOpen, setIsParameterOpen] = useState(false);
+
+  // Dropdown portal layout positioning states
+  const [stationPos, setStationPos] = useState({ top: 0, left: 0, width: 0 });
+  const [monitoringTypePos, setMonitoringTypePos] = useState({ top: 0, left: 0, width: 0 });
+  const [parameterPos, setParameterPos] = useState({ top: 0, left: 0, width: 0 });
+  
+  // Element references for positioning
   const stationBtnRef = useRef(null);
+  const monitoringTypeBtnRef = useRef(null);
+  const parameterBtnRef = useRef(null);
+  
   const dropdownRef = useRef(null);
 
   const stations = ['Al Aqah New', 'North Dibbah', 'OSB', 'NSB'];
+  const monitoringTypes = ['Sonde Information', 'Weather Information'];
+  const parameters = [
+    'Specific Conductivity',
+    'Water Temperature',
+    'Salinity',
+    'Chlorophyll',
+    'Oxygen Saturation',
+    'Dissolved Oxygen',
+    'Turbidity',
+    'pH',
+    'Depth',
+    'Blue-Green Algae'
+  ];
 
-  const updateDropdownPos = useCallback(() => {
+  // Callback to calculate exact coordinates for rendering float panels via react-portal
+  const updatePositions = useCallback(() => {
     if (stationBtnRef.current) {
       const rect = stationBtnRef.current.getBoundingClientRect();
-      setDropdownPos({
+      setStationPos({
+        top: rect.bottom + window.scrollY + 8,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+    if (monitoringTypeBtnRef.current) {
+      const rect = monitoringTypeBtnRef.current.getBoundingClientRect();
+      setMonitoringTypePos({
+        top: rect.bottom + window.scrollY + 8,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+    if (parameterBtnRef.current) {
+      const rect = parameterBtnRef.current.getBoundingClientRect();
+      setParameterPos({
         top: rect.bottom + window.scrollY + 8,
         left: rect.left + window.scrollX,
         width: rect.width
@@ -34,37 +76,56 @@ const ReportsFilterForm = () => {
     }
   }, []);
 
+  // Window scroll and resize dynamic alignment handlers
   useEffect(() => {
-    if (isStationOpen) {
-      updateDropdownPos();
-      window.addEventListener('scroll', updateDropdownPos);
-      window.addEventListener('resize', updateDropdownPos);
+    if (isStationOpen || isMonitoringTypeOpen || isParameterOpen) {
+      updatePositions();
+      window.addEventListener('scroll', updatePositions);
+      window.addEventListener('resize', updatePositions);
     }
     return () => {
-      window.removeEventListener('scroll', updateDropdownPos);
-      window.removeEventListener('resize', updateDropdownPos);
+      window.removeEventListener('scroll', updatePositions);
+      window.removeEventListener('resize', updatePositions);
     };
-  }, [isStationOpen, updateDropdownPos]);
+  }, [isStationOpen, isMonitoringTypeOpen, isParameterOpen, updatePositions]);
 
+  // Click outside menu dismiss handlers
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isStationOpen && 
-          stationBtnRef.current && !stationBtnRef.current.contains(event.target) &&
-          dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target) &&
+        (!stationBtnRef.current || !stationBtnRef.current.contains(event.target)) &&
+        (!monitoringTypeBtnRef.current || !monitoringTypeBtnRef.current.contains(event.target)) &&
+        (!parameterBtnRef.current || !parameterBtnRef.current.contains(event.target))
+      ) {
         setIsStationOpen(false);
+        setIsMonitoringTypeOpen(false);
+        setIsParameterOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isStationOpen]);
+  }, []);
 
   const handleReset = () => {
     setFormData(initialState);
     setIsStationOpen(false);
+    setIsMonitoringTypeOpen(false);
+    setIsParameterOpen(false);
   };
 
-  const dropdownClass = "flex items-center justify-between px-4 py-3.5 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium w-full mt-2 transition-all hover:bg-white/10 hover:border-white/30 outline-none";
+  const dropdownClass = "flex items-center justify-between px-4 py-2 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium w-full mt-2 transition-all hover:bg-white/10 hover:border-white/30 outline-none cursor-pointer";
   const labelClass = "text-white text-[14px] font-bold ml-1 tracking-tight";
+
+  const glassMenuStyle = {
+    borderRadius: '24px',
+    border: '1px solid rgba(0, 0, 0, 0.10)',
+    background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.45)',
+  };
 
   return (
     <div 
@@ -75,16 +136,22 @@ const ReportsFilterForm = () => {
       }}
     >
       <div className="flex flex-col gap-6 md:gap-8">
-        {/* Row 1: 4 Dropdowns - Responsive Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 relative z-30">
+        {/* Row 1: 3 Dropdowns - Responsive Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 relative z-30">
+          
+          {/* Station dropdown */}
           <div className="flex flex-col relative">
             <label className={labelClass}>{t('analytics.station')}</label>
             <button 
               ref={stationBtnRef}
-              className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}
-              onClick={() => setIsStationOpen(!isStationOpen)}
+              className={`${dropdownClass} h-[38px] md:h-[40px] mt-2`}
+              onClick={() => {
+                setIsMonitoringTypeOpen(false);
+                setIsParameterOpen(false);
+                setIsStationOpen(!isStationOpen);
+              }}
             >
-              {formData.station === 'Al Aqah New' ? t('analytics.stationName') : formData.station}
+              <span>{formData.station === 'Al Aqah New' ? t('analytics.stationName') : formData.station}</span>
               <ChevronDown size={14} className={`transition-transform duration-300 ${isStationOpen ? 'rotate-180' : ''} text-white/70`} />
             </button>
 
@@ -92,22 +159,18 @@ const ReportsFilterForm = () => {
             {isStationOpen && createPortal(
               <div 
                 ref={dropdownRef}
-                className="fixed z-[9999] p-4 flex flex-col gap-4 shadow-2xl overflow-hidden pointer-events-auto"
+                className="fixed z-[9999] p-4 flex flex-col gap-3.5 shadow-2xl overflow-hidden pointer-events-auto"
                 style={{
-                  top: dropdownPos.top,
-                  left: dropdownPos.left,
-                  width: dropdownPos.width,
-                  borderRadius: '21px',
-                  border: '1px solid rgba(0, 0, 0, 0.10)',
-                  background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
+                  ...glassMenuStyle,
+                  top: stationPos.top,
+                  left: stationPos.left,
+                  width: stationPos.width,
                 }}
               >
                 {stations.map((station) => (
                   <button
                     key={station}
-                    className="text-left text-white text-[14px] font-bold hover:text-[#1DCDDD] transition-colors"
+                    className="text-left text-white text-[13.5px] font-semibold hover:text-[#1DCDDD] transition-colors bg-transparent border-none outline-none cursor-pointer"
                     onClick={() => {
                       setFormData({ ...formData, station });
                       setIsStationOpen(false);
@@ -120,68 +183,145 @@ const ReportsFilterForm = () => {
               document.body
             )}
           </div>
-          <div className="flex flex-col">
+
+          {/* Monitoring Type dropdown */}
+          <div className="flex flex-col relative">
             <label className={labelClass}>{t('reports.monitoringType', 'Monitoring Type')}</label>
-            <button className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}>
-              {formData.monitoringType === 'Sonde Information' ? t('analytics.sondeInformation') : formData.monitoringType}
-              <ChevronDown size={14} className="text-white/70" />
+            <button 
+              ref={monitoringTypeBtnRef}
+              className={`${dropdownClass} h-[38px] md:h-[40px] mt-2`}
+              onClick={() => {
+                setIsStationOpen(false);
+                setIsParameterOpen(false);
+                setIsMonitoringTypeOpen(!isMonitoringTypeOpen);
+              }}
+            >
+              <span>{formData.monitoringType === 'Sonde Information' ? t('analytics.sondeInformation') : formData.monitoringType}</span>
+              <ChevronDown size={14} className={`transition-transform duration-300 ${isMonitoringTypeOpen ? 'rotate-180' : ''} text-white/70`} />
             </button>
+
+            {/* Monitoring Type Dropdown Menu via Portal */}
+            {isMonitoringTypeOpen && createPortal(
+              <div 
+                ref={dropdownRef}
+                className="fixed z-[9999] p-4 flex flex-col gap-3.5 shadow-2xl overflow-hidden pointer-events-auto"
+                style={{
+                  ...glassMenuStyle,
+                  top: monitoringTypePos.top,
+                  left: monitoringTypePos.left,
+                  width: monitoringTypePos.width,
+                }}
+              >
+                {monitoringTypes.map((type) => (
+                  <button
+                    key={type}
+                    className="text-left text-white text-[13.5px] font-semibold hover:text-[#1DCDDD] transition-colors bg-transparent border-none outline-none cursor-pointer"
+                    onClick={() => {
+                      setFormData({ ...formData, monitoringType: type });
+                      setIsMonitoringTypeOpen(false);
+                    }}
+                  >
+                    {type === 'Sonde Information' ? t('analytics.sondeInformation') : type}
+                  </button>
+                ))}
+              </div>,
+              document.body
+            )}
           </div>
-          <div className="flex flex-col">
+
+          {/* Parameters dropdown */}
+          <div className="flex flex-col relative">
             <label className={labelClass}>{t('analytics.parameters')}</label>
-            <button className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}>
-              {formData.parameter === 'Blue Green Algae' ? t('dashboard.blueGreenAlgae') : formData.parameter}
-              <ChevronDown size={14} className="text-white/70" />
+            <button 
+              ref={parameterBtnRef}
+              className={`${dropdownClass} h-[38px] md:h-[40px] mt-2`}
+              onClick={() => {
+                setIsStationOpen(false);
+                setIsMonitoringTypeOpen(false);
+                setIsParameterOpen(!isParameterOpen);
+              }}
+            >
+              <span className="truncate">{formData.parameter}</span>
+              <ChevronDown size={14} className={`transition-transform duration-300 ${isParameterOpen ? 'rotate-180' : ''} text-white/70`} />
             </button>
+
+            {/* Parameters Dropdown Menu via Portal */}
+            {isParameterOpen && createPortal(
+              <div 
+                ref={dropdownRef}
+                className="fixed z-[9999] p-4 flex flex-col gap-3.5 shadow-2xl overflow-y-auto max-h-[260px] analytics-panel-scroll pointer-events-auto"
+                style={{
+                  ...glassMenuStyle,
+                  top: parameterPos.top,
+                  left: parameterPos.left,
+                  width: parameterPos.width,
+                }}
+              >
+                {parameters.map((param) => (
+                  <button
+                    key={param}
+                    className="text-left text-white text-[13.5px] font-semibold hover:text-[#1DCDDD] transition-colors bg-transparent border-none outline-none cursor-pointer whitespace-nowrap"
+                    onClick={() => {
+                      setFormData({ ...formData, parameter: param });
+                      setIsParameterOpen(false);
+                    }}
+                  >
+                    {param}
+                  </button>
+                ))}
+              </div>,
+              document.body
+            )}
           </div>
-          <div className="flex flex-col">
-            <label className={labelClass}>{t('reports.type', 'Type')}</label>
-            <button className={`${dropdownClass} h-[52px] md:h-[56px] mt-2`}>
-              {formData.type === 'Raw' ? t('reports.raw', 'Raw') : formData.type}
-              <ChevronDown size={14} className="text-white/70" />
-            </button>
-          </div>
+
         </div>
 
         {/* Row 2: Date Pickers & Actions */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-row gap-5 md:gap-6 flex-1 w-full lg:max-w-[50%]">
+            
+            {/* Start Date */}
             <div className="flex flex-col flex-1">
               <label className={labelClass}>{t('reports.startDate', 'Start Date')}</label>
               <div className="relative mt-2">
                 <input 
-                  type="text" 
-                  value="1 Jan 2026" 
-                  readOnly
-                  className="w-full h-[52px] md:h-[56px] px-4 ltr:pl-12 rtl:pr-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-default ltr:text-left rtl:text-right"
+                  type="date" 
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  style={{ colorScheme: 'dark' }}
+                  className="w-full h-[38px] md:h-[40px] px-4 ltr:pl-12 rtl:pr-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-pointer ltr:text-left rtl:text-right"
                 />
-                <Calendar size={14} className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-white/70" />
+                <Calendar size={14} className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-white/70 pointer-events-none" />
               </div>
             </div>
+
+            {/* End Date */}
             <div className="flex flex-col flex-1">
               <label className={labelClass}>{t('reports.endDate', 'End Date')}</label>
               <div className="relative mt-2">
                 <input 
-                  type="text" 
-                  value="30 Jan 2026" 
-                  readOnly
-                  className="w-full h-[52px] md:h-[56px] px-4 ltr:pl-12 rtl:pr-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-default ltr:text-left rtl:text-right"
+                  type="date" 
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  style={{ colorScheme: 'dark' }}
+                  className="w-full h-[38px] md:h-[40px] px-4 ltr:pl-12 rtl:pr-12 bg-white/5 backdrop-blur-xl rounded-[12px] border border-white/20 text-white text-[14px] font-medium outline-none cursor-pointer ltr:text-left rtl:text-right"
                 />
-                <Calendar size={14} className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-white/70" />
+                <Calendar size={14} className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-white/70 pointer-events-none" />
               </div>
             </div>
+
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-row items-center justify-end gap-6 md:gap-8 pt-4 md:pt-0 border-t border-white/5 md:border-none">
             <button 
               onClick={handleReset}
-              className="text-white text-[16px] font-semibold hover:text-[#19D9F3] transition-colors"
+              className="text-white text-[16px] font-semibold hover:text-[#19D9F3] transition-colors bg-transparent border-none outline-none cursor-pointer"
             >
               {t('common.cancel')}
             </button>
             <button 
-              className="px-6 md:px-10 h-[48px] md:h-[44px] text-white text-[14px] md:text-[15px] font-bold tracking-wide flex items-center justify-center gap-1 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              className="px-6 md:px-10 h-[40px] text-white text-[14px] md:text-[15px] font-bold tracking-wide flex items-center justify-center gap-1 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer outline-none border-none"
               style={{
                 background: 'radial-gradient(50% 50% at 50% 50%, #1DCDDD 0%, #009FAC 100%)',
                 borderRadius: '29.455px',

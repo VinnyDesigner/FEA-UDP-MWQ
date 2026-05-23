@@ -17,20 +17,20 @@ const ReportsPage = () => {
       <MobileSidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
       {/* Desktop Global Header */}
-      <div className="hidden lg:block z-[2000]">
+      <div className="hidden md:block z-[2000]">
         <GlobalHeader />
       </div>
 
       {/* Main Content Area (Below Header) */}
-      <div className="flex-1 relative lg:h-[calc(100vh-80px)] flex lg:flex-row flex-col lg:mt-[80px] min-h-0 overflow-hidden">
+      <div className="flex-1 relative md:h-[calc(100vh-80px)] flex md:flex-row flex-col md:mt-[80px] min-h-0 overflow-hidden">
         {/* Desktop Sidebar */}
         <Sidebar />
 
         {/* Main Content Wrapper */}
-        <div className="flex-1 relative h-full w-full lg:ml-[80px] lg:pl-[12px] lg:pr-[8px] lg:pb-[8px] overflow-hidden flex flex-col">
+        <div className="flex-1 relative h-full w-full md:ml-[92px] md:pr-[8px] md:pb-[8px] overflow-hidden flex flex-col">
           
-          {/* --- RESPONSIVE LAYOUT (Mobile & Tablet < 1024px) --- */}
-          <div className="lg:hidden flex-1 flex flex-col w-full min-h-screen bg-transparent overflow-y-auto no-scrollbar pt-[64px]">
+          {/* --- RESPONSIVE LAYOUT (Mobile & Tablet < 768px) --- */}
+          <div className="md:hidden flex-1 flex flex-col w-full min-h-screen bg-transparent overflow-y-auto no-scrollbar pt-[64px]">
             <style>{`
               .no-scrollbar::-webkit-scrollbar { display: none; }
               .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -61,8 +61,8 @@ const ReportsPage = () => {
             </div>
           </div>
 
-          {/* --- DESKTOP LAYOUT (>= 1024px) --- */}
-          <div className="hidden lg:flex flex-1 flex-col min-w-0 h-full relative"
+          {/* --- DESKTOP LAYOUT (>= 768px) --- */}
+          <div className="hidden md:flex flex-1 flex-col min-w-0 h-full relative"
             style={{
               borderRadius: '20px',
               border: '1px solid rgba(255, 255, 255, 0.10)',

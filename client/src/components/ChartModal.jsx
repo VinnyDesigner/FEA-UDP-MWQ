@@ -139,7 +139,7 @@ const ChartModal = ({ isOpen, onClose, metric }) => {
       <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#ddd', strokeWidth: 1, strokeDasharray: '3 3' }} />
     );
 
-    const legend = showLegend && <Legend verticalAlign="top" height={36} />;
+    const legend = null;
 
     if (chartType === 'Bars') {
       return (
@@ -308,7 +308,6 @@ const ChartModal = ({ isOpen, onClose, metric }) => {
               <ToggleItem label="Dashes" checked={showDashes} onChange={setShowDashes} />
               <ToggleItem label="Date Tooltip" checked={showTooltip} onChange={setShowTooltip} />
               <ToggleItem label="Animation" checked={showAnimation} onChange={setShowAnimation} />
-              <ToggleItem label="Legend" checked={showLegend} onChange={setShowLegend} />
             </div>
           </div>
         </div>

@@ -5,7 +5,9 @@
     "reports": "Reports",
     "faq": "Frequently Asked Questions",
     "logout": "Logout",
-    "userProfile": "User Profile"
+    "userProfile": "User Profile",
+    "myProfile": "My Profile",
+    "userManagement": "User Management"
   },
   "auth": {
     "welcomeBack": "Welcome Back, Bhavani!",
@@ -19,6 +21,23 @@
     "signUp": "Sign up"
   },
   "dashboard": {
+    "commStatus": "Comm Status",
+    "gpsAlarm": "GPS Alarm",
+    "enclosureDoorOpen": "Enclosure Door Open",
+    "comm": "Comm",
+    "gps": "GPS",
+    "door": "Door",
+    "longitude": "Long",
+    "latitude": "Lat",
+    "updatedTime": {
+      "1min": "1 min ago",
+      "2min": "2 min ago",
+      "5min": "5 min ago",
+      "8min": "8 min ago"
+    },
+    "intervalVal": {
+      "30min": "30 min"
+    },
     "title": "Marine Water Quality Monitoring Dashboard",
     "subtitle": "Real-time coastal water insights for smarter environmental protection",
     "sonde": "Sonde",
@@ -45,6 +64,12 @@
     "windGust": "Wind Gust (Wind Gust)",
     "pressure": "Pressure (bar)"
   },
+  "stations": {
+    "alAqah": "AL Aqah Buoy",
+    "fujairah1": "Fujairah Buoy 1",
+    "fujairah2": "Fujairah Buoy 2",
+    "coastal": "Coastal Buoy A"
+  },
   "analytics": {
     "pageTitle": "Marine Water Quality Monitoring Dashboard - MIS Analytics",
     "pageSubtitle": "Dedicated parameter records for performance tracking and environmental analysis.",
@@ -65,6 +90,7 @@
     "details": "Details",
     "showMore": "Show More",
     "dateTime": "Date & Time",
+    "location": "Location",
     "specificConductivity": "Specific Conductivity",
     "waterTemperature": "Water Temperature",
     "salinity": "Salinity",
@@ -74,7 +100,7 @@
     "turbidity": "Turbidity",
     "ph": "pH",
     "depth": "Depth",
-    "blueGreenAlgae": "Blue Green Algae",
+    "blueGreenAlgae": "Blue-Green Algae",
     "expectedRecords": "Expected Records",
     "receivedRecords": "Received Records",
     "validRecords": "Valid Records",

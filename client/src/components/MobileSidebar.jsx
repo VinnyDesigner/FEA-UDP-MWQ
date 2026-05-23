@@ -20,13 +20,13 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     <>
       {/* Backdrop */}
       <div 
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[1100] transition-opacity duration-300 lg:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[1100] transition-opacity duration-300 md:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
 
       {/* Drawer */}
       <aside 
-        className={`fixed top-0 ltr:left-0 rtl:right-0 bottom-0 w-[280px] z-[1200] flex flex-col p-6 transition-transform duration-300 ease-out lg:hidden ${
+        className={`fixed top-0 ltr:left-0 rtl:right-0 bottom-0 w-[280px] z-[1200] flex flex-col p-6 transition-transform duration-300 ease-out md:hidden ${
           isOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full'
         }`}
         style={{
@@ -73,18 +73,45 @@ const MobileSidebar = ({ isOpen, onClose }) => {
         {/* Footer */}
         <div className="mt-auto flex flex-col gap-4 pt-6 border-t border-white/10">
           <LanguageSelector />
-          <div className="flex items-center gap-4 px-4 py-2 text-white/80 mt-2">
-            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-              <User size={20} />
-            </div>
-            <span className="text-[15px] font-medium">{t('nav.userProfile')}</span>
+          
+          <div className="text-[11px] text-white/40 font-bold uppercase tracking-wider px-4 mt-2">
+            {t('nav.userProfile') || 'User Profile'}
           </div>
-          <button 
-            onClick={() => navigate('/signin')}
-            className="flex items-center gap-4 px-4 py-2 text-white/60 hover:text-white transition-colors"
+
+          {/* Option 1: My Profile Link */}
+          <NavLink
+            to="/profile"
+            onClick={onClose}
+            className={({ isActive }) => `flex items-center gap-4 px-4 py-2.5 rounded-xl transition-all ${
+              isActive ? 'bg-[#1DCDDD]/10 border border-[#1DCDDD]/20 text-[#1DCDDD]' : 'hover:bg-white/5 text-white/80'
+            }`}
           >
-            <LogOut size={20} className="rtl:rotate-180 flex-shrink-0" />
-            <span className="text-[15px]">{t('nav.logout')}</span>
+            <User size={18} className="flex-shrink-0" />
+            <span className="text-[14.5px] font-semibold">My Profile</span>
+          </NavLink>
+
+          {/* Option 2: User Management Link */}
+          <NavLink
+            to="/user-management"
+            onClick={onClose}
+            className={({ isActive }) => `flex items-center gap-4 px-4 py-2.5 rounded-xl transition-all ${
+              isActive ? 'bg-[#1DCDDD]/10 border border-[#1DCDDD]/20 text-[#1DCDDD]' : 'hover:bg-white/5 text-white/80'
+            }`}
+          >
+            <User size={18} className="flex-shrink-0" />
+            <span className="text-[14.5px] font-semibold">User Management</span>
+          </NavLink>
+
+          {/* Logout Link */}
+          <button 
+            onClick={() => {
+              onClose();
+              navigate('/signin');
+            }}
+            className="flex items-center gap-4 px-4 py-2.5 text-white/60 hover:text-white transition-colors hover:bg-white/5 rounded-xl text-left"
+          >
+            <LogOut size={18} className="rtl:rotate-180 flex-shrink-0" />
+            <span className="text-[14.5px] font-semibold">{t('nav.logout') || 'Logout'}</span>
           </button>
         </div>
       </aside>

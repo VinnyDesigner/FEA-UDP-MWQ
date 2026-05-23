@@ -73,12 +73,12 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
   };
 
   const dropdownListStyle = {
-    borderRadius: '21px',
+    borderRadius: '30px',
     border: '1px solid rgba(0, 0, 0, 0.10)',
-    background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 12px 40px rgba(0,0,0,0.25)'
+    background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
+    backdropFilter: 'blur(30px)',
+    WebkitBackdropFilter: 'blur(30px)',
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.45)'
   };
  
   return (
@@ -91,33 +91,45 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
           className={dropdownButtonStyle}
           style={customDropdownButtonStyle}
         >
-          <span className="truncate">{selectedBuoy?.name || t('dashboard.selectStation')}</span>
+          <span className="truncate">{selectedBuoy?.nameKey ? t(`stations.${selectedBuoy.nameKey}`) : (selectedBuoy?.name || t('dashboard.selectStation'))}</span>
           <ChevronDown size={14} className={`flex-shrink-0 transition-transform duration-300 ${isLocationOpen ? 'rotate-180' : ''} text-[#072227]/70`} />
         </button>
         
         {isLocationOpen && createPortal(
           <div 
             ref={locationDropdownRef}
-            className="fixed z-[9999] p-3 flex flex-col gap-2"
+            className="fixed z-[9999] p-5 flex flex-col gap-4 shadow-2xl overflow-hidden pointer-events-auto"
             style={{
               top: locationDropdownPos.top,
               left: locationDropdownPos.left,
-              width: locationBtnRef.current ? `${locationBtnRef.current.offsetWidth}px` : '180px',
+              width: locationBtnRef.current ? `${Math.max(220, locationBtnRef.current.offsetWidth)}px` : '220px',
               ...dropdownListStyle
             }}
           >
-            {stations.map((station) => (
-              <button
-                key={station.id}
-                className="text-left text-white text-[14px] font-bold hover:text-[#1DCDDD] p-2 rounded-lg transition-colors"
-                onClick={() => {
-                  if (setSelectedBuoy) setSelectedBuoy(station);
-                  setIsLocationOpen(false);
-                }}
-              >
-                {station.name}
-              </button>
-            ))}
+            {stations.map((station) => {
+              const isChecked = selectedBuoy?.id === station.id;
+              return (
+                <button
+                  key={station.id}
+                  className="flex items-center gap-3.5 text-left outline-none cursor-pointer group w-full border-none bg-transparent"
+                  onClick={() => {
+                    if (setSelectedBuoy) setSelectedBuoy(station);
+                    setIsLocationOpen(false);
+                  }}
+                >
+                  <div 
+                    className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center transition-all ${
+                      isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                    }`}
+                  >
+                    {isChecked && <div className="w-[7px] h-[7px] bg-[#009FAC] rounded-full" />}
+                  </div>
+                  <span className="text-white text-[13px] font-semibold group-hover:text-[#1DCDDD] transition-colors whitespace-nowrap">
+                    {station.nameKey ? t(`stations.${station.nameKey}`) : station.name}
+                  </span>
+                </button>
+              );
+            })}
           </div>,
           document.body
         )}
@@ -138,28 +150,38 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
         {isTabDropdownOpen && createPortal(
           <div 
             ref={tabDropdownRef}
-            className="fixed z-[9999] p-3 flex flex-col gap-2"
+            className="fixed z-[9999] p-5 flex flex-col gap-4 shadow-2xl overflow-hidden pointer-events-auto"
             style={{
               top: tabDropdownPos.top,
               left: tabDropdownPos.left,
-              width: tabBtnRef.current ? `${tabBtnRef.current.offsetWidth}px` : '140px',
+              width: tabBtnRef.current ? `${Math.max(170, tabBtnRef.current.offsetWidth)}px` : '170px',
               ...dropdownListStyle
             }}
           >
-            {['Sonde', 'Weather'].map((tab) => (
-              <button
-                key={tab}
-                className={`text-left text-[14px] font-bold p-2 rounded-lg transition-colors ${
-                  activeTab === tab ? 'text-[#1DCDDD]' : 'text-white hover:text-[#1DCDDD]'
-                }`}
-                onClick={() => {
-                  setActiveTab(tab);
-                  setIsTabDropdownOpen(false);
-                }}
-              >
-                {tab === 'Sonde' ? t('dashboard.sonde') : t('dashboard.weather')}
-              </button>
-            ))}
+            {['Sonde', 'Weather'].map((tab) => {
+              const isChecked = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  className="flex items-center gap-3.5 text-left outline-none cursor-pointer group w-full border-none bg-transparent"
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setIsTabDropdownOpen(false);
+                  }}
+                >
+                  <div 
+                    className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center transition-all ${
+                      isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                    }`}
+                  >
+                    {isChecked && <div className="w-[7px] h-[7px] bg-[#009FAC] rounded-full" />}
+                  </div>
+                  <span className="text-white text-[13px] font-semibold group-hover:text-[#1DCDDD] transition-colors whitespace-nowrap">
+                    {tab === 'Sonde' ? t('dashboard.sonde') : t('dashboard.weather')}
+                  </span>
+                </button>
+              );
+            })}
           </div>,
           document.body
         )}

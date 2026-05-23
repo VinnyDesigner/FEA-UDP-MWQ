@@ -10,6 +10,8 @@ import Dashboard from './pages/Dashboard';
 import MISAnalyticsPage from './pages/MISAnalyticsPage';
 import ReportsPage from './pages/ReportsPage';
 import FAQPage from './pages/FAQPage';
+import ProfilePage from './pages/ProfilePage';
+import UserManagementPage from './pages/UserManagementPage';
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
         <Route path="/mis-analytics" element={<MISAnalyticsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/faq" element={<FAQPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/user-management" element={<UserManagementPage />} />
 
         {/* Default redirect to Dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

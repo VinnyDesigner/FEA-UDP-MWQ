@@ -162,7 +162,7 @@ const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }
       {isOpen && createPortal(
         <div 
           ref={dropdownRef}
-          className="fixed z-[9999] p-4 flex flex-col gap-3"
+          className="fixed z-[9999] p-4 flex flex-col gap-3.5"
           style={{
             top: dropdownPos.top,
             left: dropdownPos.left,
@@ -170,15 +170,15 @@ const DateRangeDropdown = ({ selectedDateRange, setSelectedDateRange, isMobile }
             borderRadius: '21px',
             border: '1px solid rgba(0, 0, 0, 0.10)',
             background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: '0 12px 40px rgba(0,0,0,0.25)'
+            backdropFilter: 'blur(25px)',
+            WebkitBackdropFilter: 'blur(25px)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)'
           }}
         >
           {dateRanges.map((range) => (
             <button
               key={range}
-              className={`text-left text-[13px] font-bold transition-colors ${
+              className={`text-left text-[14px] font-bold transition-colors outline-none cursor-pointer whitespace-nowrap ${
                 (selectedDateRange || 'Last 24 Hours') === range 
                   ? 'text-[#1DCDDD]' 
                   : 'text-white hover:text-[#1DCDDD]'
@@ -342,7 +342,7 @@ const TemperatureChart = ({ activeTab, selectedBuoy, selectedMetric, setSelected
     }
   }, [selectedMetric]); // eslint-disable-line
 
-  // Show ALL metrics — vertical scroll through all charts
+  // Render ALL metrics scrollably as requested by the user
   const displayMetrics = metrics;
 
   return (
@@ -359,116 +359,109 @@ const TemperatureChart = ({ activeTab, selectedBuoy, selectedMetric, setSelected
         overflow: 'hidden'
       }}
     >
+      {/* Hide scrollbars but keep native snap scrolling behavior */}
       <style>{`
-        .chart-scroll-container::-webkit-scrollbar { width: 5px; }
-        .chart-scroll-container::-webkit-scrollbar-track { background: rgba(0,159,172,0.04); border-radius: 10px; }
-        .chart-scroll-container::-webkit-scrollbar-thumb { background: rgba(0, 159, 172, 0.25); border-radius: 10px; transition: background 0.3s; }
-        .chart-scroll-container::-webkit-scrollbar-thumb:hover { background: rgba(0, 159, 172, 0.5); }
+        .charts-snap-container::-webkit-scrollbar { display: none; }
+        .charts-snap-container { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-      {/* Scrollable charts container */}
+
+      {/* Scrollable snapping container */}
       <div
         ref={containerRef}
-        className="chart-scroll-container flex-1 overflow-y-auto"
+        className="flex-grow overflow-y-auto charts-snap-container"
         style={{ 
-          padding: isMobile ? '0 10px' : '0 20px',
+          padding: 0,
+          height: '100%',
           scrollSnapType: 'y mandatory',
-          scrollPadding: '0px'
+          scrollBehavior: 'smooth'
         }}
       >
-
         {displayMetrics.map((metric, idx) => {
           const currentData = getDynamicData(metric);
           const translatedTitle = metricKeyMap[metric] ? t(metricKeyMap[metric]) : metric;
-          const isActive = metric === selectedMetric;
           const gradId = `chartGrad_${idx}`;
 
           return (
-            <React.Fragment key={metric}>
-              <div
-                ref={(el) => (chartRefs.current[metric] = el)}
-                data-metric={metric}
-                className="flex flex-col"
-                style={{
-                  minHeight: isMobile ? '180px' : '230px',
-                  padding: '16px 0px',
-                  transition: 'all 0.3s',
-                  scrollSnapAlign: 'start'
-                }}
-              >
-                {/* Chart header */}
-                <div className={`flex justify-between items-center ${isMobile ? 'mb-1' : 'mb-2'}`}>
-                  <h3
-                    className={`${
-                      isMobile ? 'text-[13px]' : 'text-[14px]'
-                    } font-bold tracking-tight`}
-                    style={{ color: isActive ? '#009FAC' : '#072227' }}
-                  >
-                    {translatedTitle}
-                  </h3>
-                  <button
-                    onClick={() => {
-                      setActiveModalMetric(metric);
-                      setIsModalOpen(true);
-                    }}
-                    className="text-gray-400 hover:text-[#009FAC] transition-all p-1.5 bg-white/60 rounded-lg shadow-sm border border-white/40 cursor-pointer"
-                  >
-                    <Maximize2 size={12} />
-                  </button>
-                </div>
-
-                {/* Chart body */}
-                <div style={{ height: isMobile ? '120px' : '160px', width: '100%' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={currentData} margin={{ top: 6, right: 12, left: -20, bottom: 6 }}>
-                      <defs>
-                        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#1DCDDD" stopOpacity={isActive ? 0.4 : 0.2} />
-                          <stop offset="95%" stopColor="#1DCDDD" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="5 5" vertical={false} stroke="rgba(0,0,0,0.07)" />
-                      <XAxis
-                        dataKey="label"
-                        axisLine={false}
-                        tickLine={false}
-                        tick={<CustomXAxisTick />}
-                        interval={0}
-                        height={32}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.4)', fontWeight: 500 }}
-                        domain={['auto', 'auto']}
-                        width={42}
-                      />
-                      <Tooltip
-                        content={<CustomTooltip selectedMetric={metric} />}
-                        cursor={{ stroke: 'rgba(0,159,172,0.2)', strokeWidth: 1, strokeDasharray: '4 4' }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke={isActive ? '#009FAC' : '#1DCDDD'}
-                        strokeWidth={isActive ? 2.5 : 1.8}
-                        fillOpacity={1}
-                        fill={`url(#${gradId})`}
-                        dot={{ r: 3, fill: '#ffffff', stroke: isActive ? '#009FAC' : '#1DCDDD', strokeWidth: 2 }}
-                        activeDot={{ r: 5, fill: '#ffffff', stroke: '#009FAC', strokeWidth: 2 }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+            <div
+              key={metric}
+              ref={(el) => (chartRefs.current[metric] = el)}
+              data-metric={metric}
+              className="flex flex-col justify-between"
+              style={{
+                width: '100%',
+                height: '100%',
+                minHeight: '100%',
+                scrollSnapAlign: 'start',
+                scrollSnapStop: 'always',
+                padding: isMobile ? '12px 12px' : '16px 20px',
+                boxSizing: 'border-box'
+              }}
+            >
+              {/* Chart header */}
+              <div className="flex justify-between items-center mb-2.5 flex-shrink-0">
+                <h3
+                  className={`${
+                    isMobile ? 'text-[13px]' : 'text-[14px]'
+                  } font-bold tracking-tight`}
+                  style={{ color: '#000000' }}
+                >
+                  {translatedTitle}
+                </h3>
+                <button
+                  onClick={() => {
+                    setActiveModalMetric(metric);
+                    setIsModalOpen(true);
+                  }}
+                  className="text-gray-400 hover:text-[#009FAC] transition-all p-1.5 bg-white/60 rounded-lg shadow-sm border border-white/40 cursor-pointer"
+                >
+                  <Maximize2 size={12} />
+                </button>
               </div>
 
-              {/* Horizontal line separator between two graphs */}
-              {idx < displayMetrics.length - 1 && (
-                <div 
-                  className="flex-shrink-0 h-[1.5px] w-full opacity-60" 
-                  style={{ background: 'rgba(255, 255, 255, 0.45)' }} 
-                />
-              )}
-            </React.Fragment>
+              {/* Chart body - stretches to utilize 100% of remaining vertical layout */}
+              <div className="flex-1 min-h-0" style={{ width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={currentData} margin={{ top: 6, right: 12, left: -20, bottom: 6 }}>
+                    <defs>
+                      <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#1DCDDD" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#1DCDDD" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="5 5" vertical={false} stroke="rgba(0,0,0,0.07)" />
+                    <XAxis
+                      dataKey="label"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={<CustomXAxisTick />}
+                      interval={0}
+                      height={32}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.4)', fontWeight: 500 }}
+                      domain={['auto', 'auto']}
+                      width={42}
+                    />
+                    <Tooltip
+                      content={<CustomTooltip selectedMetric={metric} />}
+                      cursor={{ stroke: 'rgba(0,159,172,0.2)', strokeWidth: 1, strokeDasharray: '4 4' }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#009FAC"
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill={`url(#${gradId})`}
+                      dot={{ r: 3, fill: '#ffffff', stroke: '#009FAC', strokeWidth: 2 }}
+                      activeDot={{ r: 5, fill: '#ffffff', stroke: '#009FAC', strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           );
         })}
       </div>{/* end scroll container */}
