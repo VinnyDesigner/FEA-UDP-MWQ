@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 
@@ -8,42 +7,18 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
   
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isTabDropdownOpen, setIsTabDropdownOpen] = useState(false);
-  const [locationDropdownPos, setLocationDropdownPos] = useState({ top: 0, left: 0 });
-  const [tabDropdownPos, setTabDropdownPos] = useState({ top: 0, left: 0 });
+  const [tempTab, setTempTab] = useState(activeTab);
 
   const locationBtnRef = useRef(null);
   const tabBtnRef = useRef(null);
   const locationDropdownRef = useRef(null);
   const tabDropdownRef = useRef(null);
 
-  const updateDropdownPos = useCallback(() => {
-    if (locationBtnRef.current) {
-      const rect = locationBtnRef.current.getBoundingClientRect();
-      setLocationDropdownPos({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX
-      });
-    }
-    if (tabBtnRef.current) {
-      const rect = tabBtnRef.current.getBoundingClientRect();
-      setTabDropdownPos({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX
-      });
-    }
-  }, []);
-
   useEffect(() => {
-    if (isLocationOpen || isTabDropdownOpen) {
-      updateDropdownPos();
-      window.addEventListener('scroll', updateDropdownPos);
-      window.addEventListener('resize', updateDropdownPos);
+    if (isTabDropdownOpen) {
+      setTempTab(activeTab);
     }
-    return () => {
-      window.removeEventListener('scroll', updateDropdownPos);
-      window.removeEventListener('resize', updateDropdownPos);
-    };
-  }, [isLocationOpen, isTabDropdownOpen, updateDropdownPos]);
+  }, [isTabDropdownOpen, activeTab]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -62,50 +37,86 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isLocationOpen, isTabDropdownOpen]);
 
-  const dropdownButtonStyle = "flex items-center justify-between w-full px-5 py-2.5 backdrop-blur-xl text-[#072227] text-[14px] font-semibold transition-all outline-none cursor-pointer";
- 
-  const customDropdownButtonStyle = {
-    borderRadius: '12px',
+  // Shared pill button — used by both Location and Sonde
+  const pillBase = {
+    borderRadius: '24px',
     border: '1px solid rgba(255, 255, 255, 0.30)',
     background: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.25) 100%)',
     boxShadow: '0 4px 4px 0 rgba(255, 255, 255, 0.25) inset',
     backdropFilter: 'blur(10px)',
+    height: '36px',
+    padding: '0 14px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    cursor: 'pointer',
+    outline: 'none',
   };
 
-  const dropdownListStyle = {
-    borderRadius: '30px',
+  // Dropdown card — min-width ensures CTAs never wrap
+  const dropdownCard = {
+    position: 'absolute',
+    top: 'calc(100% + 8px)',
+    zIndex: 9999,
+    minWidth: '220px',
+    borderRadius: '20px',
     border: '1px solid rgba(0, 0, 0, 0.10)',
     background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%), radial-gradient(251.65% 89.92% at 50.22% 50.31%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.24) 100%)',
     backdropFilter: 'blur(30px)',
     WebkitBackdropFilter: 'blur(30px)',
-    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.45)'
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.45)',
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
   };
- 
+
+  // Apply Filters CTA — matches design system (ProfilePage, SignIn, etc.)
+  const applyBtnStyle = {
+    background: 'radial-gradient(50% 50% at 50% 50%, #1DCDDD 0%, #009FAC 100%)',
+    borderRadius: '29px',
+    boxShadow: '0 0 50px 0 rgba(0, 159, 172, 0.30), 0 0 1px 4px rgba(255, 255, 255, 0.10), 0 -4px 2px 0 rgba(0, 0, 0, 0.25) inset, 0 2px 1px 0 rgba(255, 255, 255, 0.25) inset',
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: '12px',
+    padding: '8px 20px',
+    cursor: 'pointer',
+    outline: 'none',
+    border: 'none',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.2s ease',
+    flexShrink: 0,
+  };
+
+  const tabLabel =
+    activeTab === 'Sonde' ? t('dashboard.sonde') :
+    activeTab === 'Weather' ? t('dashboard.weather') :
+    t('dashboard.windrose');
+
   return (
-    <div className="flex items-center gap-3 w-full pb-2">
-      {/* Location Dropdown */}
-      <div className="flex-1 relative">
+    <div className="flex items-center justify-between w-full pb-2">
+
+      {/* ── Location — 45% left ── */}
+      <div className="relative" style={{ width: '45%', zIndex: isLocationOpen ? 100 : 1 }}>
         <button
           ref={locationBtnRef}
-          onClick={() => setIsLocationOpen(!isLocationOpen)}
-          className={dropdownButtonStyle}
-          style={customDropdownButtonStyle}
+          onClick={() => { setIsLocationOpen(!isLocationOpen); setIsTabDropdownOpen(false); }}
+          style={pillBase}
         >
-          <span className="truncate">{selectedBuoy?.nameKey ? t(`stations.${selectedBuoy.nameKey}`) : (selectedBuoy?.name || t('dashboard.selectStation'))}</span>
-          <ChevronDown size={14} className={`flex-shrink-0 transition-transform duration-300 ${isLocationOpen ? 'rotate-180' : ''} text-[#072227]/70`} />
+          <span className="truncate text-[#072227] text-[12px] font-semibold">
+            {selectedBuoy?.nameKey
+              ? t(`stations.${selectedBuoy.nameKey}`)
+              : (selectedBuoy?.name || t('dashboard.selectStation'))}
+          </span>
+          <ChevronDown
+            size={13}
+            className={`flex-shrink-0 ml-2 transition-transform duration-300 ${isLocationOpen ? 'rotate-180' : ''} text-[#072227]/70`}
+          />
         </button>
-        
-        {isLocationOpen && createPortal(
-          <div 
-            ref={locationDropdownRef}
-            className="fixed z-[9999] p-5 flex flex-col gap-4 shadow-2xl overflow-hidden pointer-events-auto"
-            style={{
-              top: locationDropdownPos.top,
-              left: locationDropdownPos.left,
-              width: locationBtnRef.current ? `${Math.max(220, locationBtnRef.current.offsetWidth)}px` : '220px',
-              ...dropdownListStyle
-            }}
-          >
+
+        {isLocationOpen && (
+          <div ref={locationDropdownRef} style={{ ...dropdownCard, left: 0, right: 'auto' }}>
             {stations.map((station) => {
               const isChecked = selectedBuoy?.id === station.id;
               return (
@@ -117,75 +128,82 @@ const DashboardHeader = ({ activeTab, setActiveTab, stations = [], selectedBuoy,
                     setIsLocationOpen(false);
                   }}
                 >
-                  <div 
-                    className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center transition-all ${
-                      isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
-                    }`}
-                  >
+                  <div className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                    isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                  }`}>
                     {isChecked && <div className="w-[7px] h-[7px] bg-[#009FAC] rounded-full" />}
                   </div>
-                  <span className="text-white text-[13px] font-semibold group-hover:text-[#1DCDDD] transition-colors whitespace-nowrap">
+                  <span className="text-white text-[13px] font-semibold group-hover:text-[#1DCDDD] transition-colors">
                     {station.nameKey ? t(`stations.${station.nameKey}`) : station.name}
                   </span>
                 </button>
               );
             })}
-          </div>,
-          document.body
+          </div>
         )}
       </div>
 
-      {/* Tab (Sonde/Weather) Dropdown */}
-      <div className="flex-1 relative">
+      {/* ── Sonde/Tab — 35% right ── */}
+      <div className="relative" style={{ width: '35%', zIndex: isTabDropdownOpen ? 100 : 1 }}>
         <button
           ref={tabBtnRef}
-          onClick={() => setIsTabDropdownOpen(!isTabDropdownOpen)}
-          className={dropdownButtonStyle}
-          style={customDropdownButtonStyle}
+          onClick={() => { setIsTabDropdownOpen(!isTabDropdownOpen); setIsLocationOpen(false); }}
+          style={pillBase}
         >
-          <span>{activeTab === 'Sonde' ? t('dashboard.sonde') : t('dashboard.weather')}</span>
-          <ChevronDown size={14} className={`flex-shrink-0 transition-transform duration-300 ${isTabDropdownOpen ? 'rotate-180' : ''} text-[#072227]/70`} />
+          <span className="text-[#072227] text-[12px] font-semibold truncate">{tabLabel}</span>
+          <ChevronDown
+            size={13}
+            className={`flex-shrink-0 ml-2 transition-transform duration-300 ${isTabDropdownOpen ? 'rotate-180' : ''} text-[#072227]/70`}
+          />
         </button>
-        
-        {isTabDropdownOpen && createPortal(
-          <div 
-            ref={tabDropdownRef}
-            className="fixed z-[9999] p-5 flex flex-col gap-4 shadow-2xl overflow-hidden pointer-events-auto"
-            style={{
-              top: tabDropdownPos.top,
-              left: tabDropdownPos.left,
-              width: tabBtnRef.current ? `${Math.max(170, tabBtnRef.current.offsetWidth)}px` : '170px',
-              ...dropdownListStyle
-            }}
-          >
-            {['Sonde', 'Weather'].map((tab) => {
-              const isChecked = activeTab === tab;
+
+        {isTabDropdownOpen && (
+          <div ref={tabDropdownRef} style={{ ...dropdownCard, left: 'auto', right: 0 }}>
+            {['Sonde', 'Weather', 'Windrose'].map((tab) => {
+              const isChecked = tempTab === tab;
               return (
                 <button
                   key={tab}
                   className="flex items-center gap-3.5 text-left outline-none cursor-pointer group w-full border-none bg-transparent"
-                  onClick={() => {
-                    setActiveTab(tab);
-                    setIsTabDropdownOpen(false);
-                  }}
+                  onClick={() => setTempTab(tab)}
                 >
-                  <div 
-                    className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center transition-all ${
-                      isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
-                    }`}
-                  >
+                  <div className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                    isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                  }`}>
                     {isChecked && <div className="w-[7px] h-[7px] bg-[#009FAC] rounded-full" />}
                   </div>
-                  <span className="text-white text-[13px] font-semibold group-hover:text-[#1DCDDD] transition-colors whitespace-nowrap">
-                    {tab === 'Sonde' ? t('dashboard.sonde') : t('dashboard.weather')}
+                  <span className="text-white text-[13px] font-semibold group-hover:text-[#1DCDDD] transition-colors">
+                    {tab === 'Sonde' ? t('dashboard.sonde') :
+                     tab === 'Weather' ? t('dashboard.weather') :
+                     t('dashboard.windrose')}
                   </span>
                 </button>
               );
             })}
-          </div>,
-          document.body
+
+            {/* CTA row */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-white/10 w-full">
+              <button
+                onClick={() => setIsTabDropdownOpen(false)}
+                className="text-white/60 hover:text-white text-[12px] font-semibold bg-transparent border-none cursor-pointer outline-none transition-colors flex-shrink-0"
+              >
+                {t('reports.cancel') || 'Cancel'}
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab(tempTab);
+                  setIsTabDropdownOpen(false);
+                }}
+                style={applyBtnStyle}
+                className="hover:scale-[1.03] active:scale-[0.97]"
+              >
+                {t('common.applyFilters', 'Apply Filters')}
+              </button>
+            </div>
+          </div>
         )}
       </div>
+
     </div>
   );
 };

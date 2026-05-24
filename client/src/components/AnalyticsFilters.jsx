@@ -8,6 +8,7 @@ const viewTypes = ['Graph and Table View', 'Graph View', 'Table View'];
 
 const AnalyticsFilters = ({ 
   isMobile = false, 
+  isTablet = false,
   isBuoysAnalytics = false,
   selectedBuoy = 'Al Aqah Buoy', 
   setSelectedBuoy, 
@@ -155,13 +156,16 @@ const AnalyticsFilters = ({
       setTempChartType(currentChartType);
       setTempInfoType(infoType);
       setTempPredefined(predefined);
+      setTempSelectedView(selectedView);
       setActiveFilterStep('main');
       setOpenSelect(null);
     }
-  }, [isFilterOpen, params, duration, currentChartType, infoType, predefined]);
+  }, [isFilterOpen, params, duration, currentChartType, infoType, predefined, selectedView]);
 
   // Style helpers
-  const dropdownClass = "flex items-center justify-between px-5 py-2.5 text-white text-[13px] font-semibold w-full transition-all outline-none select-none cursor-pointer whitespace-nowrap";
+  const dropdownClass = `flex items-center justify-between ${
+    isTablet ? 'px-[19.2px] py-[8px] text-[9.6px]' : 'px-5 py-2.5 text-[13px]'
+  } text-white font-semibold w-full transition-all outline-none select-none cursor-pointer whitespace-nowrap`;
   const tabTriggerStyle = {
     borderRadius: '24px',
     border: '1px solid rgba(255, 255, 255, 0.30)',
@@ -200,20 +204,16 @@ const AnalyticsFilters = ({
     return selectedBuoy;
   };
 
-  return (
-    <div className="w-full lg:w-auto">
-      <div className={`flex ${isMobile ? 'flex-col gap-4 w-full' : 'flex-row items-center gap-4'}`}>
-        
-        {/* View Type Dropdown */}
-        <div className="flex-shrink-0 min-w-[170px]">
-          <button 
+  const viewTypeDropdown = (
+    <div className={`flex-shrink-0 ${isTablet ? 'min-w-[136px]' : 'min-w-[170px]'}`}>
+      <button 
             ref={viewBtnRef}
             onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
             className={dropdownClass}
             style={tabTriggerStyle}
           >
             <span>{selectedView}</span>
-            <ChevronDown size={14} className={`transition-transform duration-300 ${isViewDropdownOpen ? 'rotate-180' : ''} text-white/70 ml-2`} />
+            <ChevronDown size={isTablet ? 11 : 14} className={`transition-transform duration-300 ${isViewDropdownOpen ? 'rotate-180' : ''} text-white/70 ml-2`} />
           </button>
 
           {isViewDropdownOpen && createPortal(
@@ -254,18 +254,19 @@ const AnalyticsFilters = ({
             </div>,
             document.body
           )}
-        </div>
+    </div>
+  );
 
-        {/* Location/Buoy Dropdown (with custom multi-select support for Buoys Analytics page!) */}
-        <div className="flex-shrink-0 min-w-[170px]">
-          <button 
+  const buoyDropdown = (
+    <div className={`flex-shrink-0 ${isTablet ? 'min-w-[136px]' : 'min-w-[170px]'}`}>
+      <button 
             ref={buoyBtnRef}
             onClick={() => setIsBuoyDropdownOpen(!isBuoyDropdownOpen)}
             className={dropdownClass}
             style={tabTriggerStyle}
           >
             <span>{getBuoyTriggerLabel()}</span>
-            <ChevronDown size={14} className={`transition-transform duration-300 ${isBuoyDropdownOpen ? 'rotate-180' : ''} text-white/70 ml-2`} />
+            <ChevronDown size={isTablet ? 11 : 14} className={`transition-transform duration-300 ${isBuoyDropdownOpen ? 'rotate-180' : ''} text-white/70 ml-2`} />
           </button>
 
           {isBuoyDropdownOpen && createPortal(
@@ -336,17 +337,20 @@ const AnalyticsFilters = ({
             </div>,
             document.body
           )}
-        </div>
+    </div>
+  );
 
-        {/* Filter Button & Main Popover Card */}
-        <div className="flex flex-col">
-          <button 
+  const filterButton = (
+    <div className="flex flex-col">
+      <button 
             ref={filterBtnRef}
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="px-6 h-[38px] text-white text-[13px] font-bold tracking-wide flex items-center justify-center gap-1.5 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer select-none"
+            className={`${
+              isTablet ? 'px-[19.2px] py-[8px] text-[9.6px] h-auto' : 'px-6 h-[38px] text-[13px]'
+            } text-white font-bold tracking-wide flex items-center justify-center gap-1.5 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer select-none`}
             style={applyButtonStyle}
           >
-            <Filter size={13} className="text-white" />
+            <Filter size={isTablet ? 10 : 13} className="text-white" />
             <span className="whitespace-nowrap text-white">Filter</span>
           </button>
 
@@ -587,6 +591,32 @@ const AnalyticsFilters = ({
                     </div>
                   </div>
 
+                  {/* View Type — tablet only, shown inside filter popup */}
+                  {isTablet && (
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <span className="text-white text-[10px] font-bold tracking-wider uppercase opacity-75">View</span>
+                      <div className="flex flex-col gap-2.5">
+                        {viewTypes.map((type) => {
+                          const isChecked = tempSelectedView === type;
+                          return (
+                            <button
+                              key={type}
+                              className="flex items-center gap-2.5 text-left outline-none cursor-pointer group border-none bg-transparent"
+                              onClick={() => setTempSelectedView(type)}
+                            >
+                              <div className={`w-[15px] h-[15px] rounded-full border-2 flex items-center justify-center transition-all ${
+                                isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                              }`}>
+                                {isChecked && <div className="w-[6px] h-[6px] bg-[#009FAC] rounded-full" />}
+                              </div>
+                              <span className="text-white text-[10.5px] font-semibold">{type}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Bottom Actions Row */}
                   <div className="flex items-center justify-end gap-5 pt-3 border-t border-white/10 mt-1">
                     <button
@@ -628,6 +658,7 @@ const AnalyticsFilters = ({
                         setCurrentChartType(tempChartType);
                         setInfoType(tempInfoType);
                         setPredefined(tempPredefined);
+                        if (isTablet && setSelectedView) setSelectedView(tempSelectedView);
                         setIsFilterOpen(false);
                       }}
                     >
@@ -712,6 +743,32 @@ const AnalyticsFilters = ({
                     </div>
                   </div>
 
+                  {/* View Type — tablet only, shown inside filter popup */}
+                  {isTablet && (
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <span className="text-white text-[10px] font-bold tracking-wider uppercase opacity-75">View</span>
+                      <div className="flex flex-col gap-2.5">
+                        {viewTypes.map((type) => {
+                          const isChecked = tempSelectedView === type;
+                          return (
+                            <button
+                              key={type}
+                              className="flex items-center gap-2.5 text-left outline-none cursor-pointer group border-none bg-transparent"
+                              onClick={() => setTempSelectedView(type)}
+                            >
+                              <div className={`w-[15px] h-[15px] rounded-full border-2 flex items-center justify-center transition-all ${
+                                isChecked ? 'border-white bg-white' : 'border-white/40 bg-transparent group-hover:border-white/60'
+                              }`}>
+                                {isChecked && <div className="w-[6px] h-[6px] bg-[#009FAC] rounded-full" />}
+                              </div>
+                              <span className="text-white text-[10.5px] font-semibold">{type}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Bottom Actions Row */}
                   <div className="flex items-center justify-end gap-5 pt-3 border-t border-white/10 mt-1">
                     <button
@@ -733,6 +790,7 @@ const AnalyticsFilters = ({
                         setDuration(tempDuration);
                         setCurrentChartType(tempChartType);
                         setInfoType(tempInfoType);
+                        if (isTablet && setSelectedView) setSelectedView(tempSelectedView);
                         setIsFilterOpen(false);
                       }}
                     >
@@ -910,8 +968,26 @@ const AnalyticsFilters = ({
             </div>,
             document.body
           )}
-        </div>
+    </div>
+  );
 
+  if (isTablet) {
+    return (
+      <div className="w-full lg:w-auto">
+        <div className="flex flex-row items-center justify-end gap-4">
+          {buoyDropdown}
+          {filterButton}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full lg:w-auto">
+      <div className={`flex ${isMobile ? 'flex-col gap-4 w-full' : 'flex-row items-center gap-4'}`}>
+        {viewTypeDropdown}
+        {buoyDropdown}
+        {filterButton}
       </div>
     </div>
   );

@@ -224,7 +224,7 @@ const DataCaptureRateTable = ({ isMobile = false, activeTab = 'Data Capture Rate
               </thead>
               <tbody>
                 {captureRateData.map((row, index) => (
-                  <tr key={index} className="border-b border-white/10 h-[50px] hover:bg-white/5 transition-colors">
+                  <tr key={index} className="border-b border-white/10 h-[50px] transition-colors">
                     <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.conductivity}</td>
                     <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.temp}</td>
                     <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.salinity}</td>

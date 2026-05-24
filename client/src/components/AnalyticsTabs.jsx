@@ -7,7 +7,7 @@ const tabs = [
   'Station Health'
 ];
 
-const AnalyticsTabs = ({ activeTab = 'Live Data', onTabChange, isMobile = false }) => {
+const AnalyticsTabs = ({ activeTab = 'Live Data', onTabChange, isMobile = false, isTablet = false }) => {
   const { t } = useTranslation();
   
   const tabKeyMap = {
@@ -51,7 +51,9 @@ const AnalyticsTabs = ({ activeTab = 'Live Data', onTabChange, isMobile = false 
             <button
               key={tab}
               onClick={() => onTabChange?.(tab)}
-              className="px-6 py-2.5 text-xs transition-all duration-300 whitespace-nowrap text-center flex-1 min-w-max outline-none cursor-pointer"
+              className={`transition-all duration-300 whitespace-nowrap text-center flex-1 min-w-max outline-none cursor-pointer ${
+                isTablet ? 'px-[19.2px] py-[8px] text-[9.6px]' : 'px-6 py-2.5 text-xs'
+              }`}
               style={
                 isActive
                   ? {

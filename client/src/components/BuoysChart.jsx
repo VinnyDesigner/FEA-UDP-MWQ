@@ -96,7 +96,8 @@ const BuoysChart = ({
   height,
   isGraphAndTableView = false,
   isBuoysAnalytics = false,
-  thresholdValue = false
+  thresholdValue = false,
+  isTablet = false
 }) => {
   const { t } = useTranslation();
   const [expandedParam, setExpandedParam] = React.useState(null);
@@ -233,6 +234,7 @@ const BuoysChart = ({
         const activeBuoys = Array.isArray(selectedBuoy) ? selectedBuoy : [selectedBuoy];
 
         return (
+          <>
           <div className={`w-full grid grid-cols-1 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2'} gap-6 overflow-y-auto pr-1 panel-chart-scrollbar ${scrollContainerHeightClass}`}>
             {uniqueActiveParams.map((param) => {
               const chartHeight = isMobile
@@ -490,6 +492,16 @@ const BuoysChart = ({
               );
             })}
           </div>
+
+          {/* Tablet Vertical Scrolling Clue */}
+          {isTablet && uniqueActiveParams.length > 2 && (
+            <div className="flex justify-center items-center py-2 mt-2 opacity-60">
+              <ChevronDown size={14} className="text-[#1DCDDD] animate-pulse" />
+              <span className="text-[11px] text-white font-semibold tracking-widest uppercase mx-3">Swipe vertically to view more graphs</span>
+              <ChevronDown size={14} className="text-[#1DCDDD] animate-pulse" />
+            </div>
+          )}
+          </>
         );
       })() : (
         <div className={`w-full ${isMobile ? 'min-h-[340px] flex justify-center' : ''}`}>

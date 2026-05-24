@@ -40,6 +40,7 @@ const MISAnalyticsPage = () => {
   }, []);
 
   const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
   return (
     <div className="w-screen h-screen md:overflow-hidden p-0 flex flex-col bg-transparent relative">
@@ -227,9 +228,10 @@ const MISAnalyticsPage = () => {
 
               {/* Controls Row (Inside Panel) */}
               <div className="flex items-center justify-between mb-6">
-                <AnalyticsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <AnalyticsTabs activeTab={activeTab} onTabChange={setActiveTab} isTablet={isTablet} />
                 {activeTab === 'Live Data' ? (
                   <AnalyticsFilters 
+                    isTablet={isTablet}
                     selectedBuoy={selectedBuoy} 
                     setSelectedBuoy={setSelectedBuoy} 
                     selectedView={selectedView} 
@@ -243,6 +245,7 @@ const MISAnalyticsPage = () => {
                   />
                 ) : activeTab === 'Buoys Analytics' ? (
                   <AnalyticsFilters 
+                    isTablet={isTablet}
                     isBuoysAnalytics={true}
                     selectedBuoy={selectedBuoys} 
                     setSelectedBuoy={setSelectedBuoys} 
@@ -328,7 +331,7 @@ const MISAnalyticsPage = () => {
                       </div>
 
                       {/* Scrollable body: chart + table */}
-                      <div className={selectedView === 'Graph and Table View' ? "flex-1 flex flex-col min-h-0 overflow-hidden px-6 pb-6" : "flex-1 overflow-y-auto analytics-panel-scroll min-h-0 px-6 pb-6"}>
+                      <div className={selectedView === 'Graph and Table View' && !isTablet ? "flex-1 flex flex-col min-h-0 overflow-hidden px-6 pb-6" : "flex-1 overflow-y-auto analytics-panel-scroll min-h-0 px-6 pb-6"}>
                         {/* Chart (no header — handled above) */}
                         {selectedView !== 'Table View' && (
                           <div className={selectedView === 'Graph and Table View' ? "flex-shrink-0" : "w-full"}>
@@ -338,8 +341,9 @@ const MISAnalyticsPage = () => {
                               selectedBuoy={selectedBuoy} 
                               chartType={chartType} 
                               selectedDuration={selectedDuration} 
-                              height={selectedView === 'Graph and Table View' ? '180px' : undefined}
+                              height={selectedView === 'Graph and Table View' && !isTablet ? '150px' : (isTablet ? '250px' : undefined)}
                               isGraphAndTableView={selectedView === 'Graph and Table View'}
+                              isTablet={isTablet}
                             />
                           </div>
                         )}
@@ -352,6 +356,7 @@ const MISAnalyticsPage = () => {
                               selectedParams={selectedParams} 
                               selectedDuration={selectedDuration} 
                               isGraphAndTableView={selectedView === 'Graph and Table View'}
+                              isTablet={isTablet}
                             />
                           </div>
                         )}
@@ -380,7 +385,7 @@ const MISAnalyticsPage = () => {
                       </div>
 
                       {/* Scrollable body: chart + legend + table */}
-                      <div className={selectedView === 'Graph and Table View' ? "flex-1 flex flex-col min-h-0 overflow-hidden px-6 pb-6" : "flex-1 overflow-y-auto analytics-panel-scroll min-h-0 px-6 pb-6"}>
+                      <div className={selectedView === 'Graph and Table View' && !isTablet ? "flex-1 flex flex-col min-h-0 overflow-hidden px-6 pb-6" : "flex-1 overflow-y-auto analytics-panel-scroll min-h-0 px-6 pb-6"}>
                         {/* Chart (no header — handled above) */}
                         {selectedView !== 'Table View' && (
                           <div className={selectedView === 'Graph and Table View' ? "flex-shrink-0" : "w-full"}>
@@ -390,10 +395,11 @@ const MISAnalyticsPage = () => {
                               selectedBuoy={selectedBuoys} 
                               chartType={chartType} 
                               selectedDuration={selectedDuration} 
-                              height={selectedView === 'Graph and Table View' ? '180px' : undefined}
+                              height={selectedView === 'Graph and Table View' && !isTablet ? '150px' : (isTablet ? '250px' : undefined)}
                               isGraphAndTableView={selectedView === 'Graph and Table View'}
                               isBuoysAnalytics={true}
                               thresholdValue={thresholdValue}
+                              isTablet={isTablet}
                             />
                           </div>
                         )}
@@ -411,6 +417,7 @@ const MISAnalyticsPage = () => {
                               selectedParams={selectedParams} 
                               selectedDuration={selectedDuration} 
                               isGraphAndTableView={selectedView === 'Graph and Table View'}
+                              isTablet={isTablet}
                             />
                           </div>
                         )}

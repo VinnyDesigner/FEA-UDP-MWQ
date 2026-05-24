@@ -127,7 +127,7 @@ const AnalyticsTable = ({ isMobile = false, selectedBuoys = ['Al Aqah Buoy'] }) 
               {dynamicRows.map((row, index) => (
                 <div 
                   key={index} 
-                  className={`${gridTemplate} group border-b border-white/5 hover:bg-white/5 transition-colors px-4 py-5 text-[14px]`}
+                  className={`${gridTemplate} group border-b border-white/5 transition-colors px-4 py-5 text-[14px]`}
                 >
                   <div className="text-white/90 font-medium">{row.dateTime}</div>
                   <div className="text-white/70">{row.station}</div>

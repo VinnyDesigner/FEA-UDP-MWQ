@@ -80,7 +80,8 @@ const SensorDataTable = ({
   selectedBuoy = 'Al Aqah Buoy', 
   selectedParams = [], 
   selectedDuration = 'Last Day',
-  isGraphAndTableView = false
+  isGraphAndTableView = false,
+  isTablet = false
 }) => {
   const { t } = useTranslation();
   const [scrollLeft, setScrollLeft] = React.useState(0);
@@ -221,7 +222,7 @@ const SensorDataTable = ({
                 <th 
                   className="px-5 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 left-0 z-30 w-[180px] min-w-[180px] border-b border-white/10"
                   style={{
-                    background: (scrollTop > 0 || scrollLeft > 0) ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                    background: (scrollTop > 0 || scrollLeft > 0) ? 'rgba(20, 58, 62, 0.98)' : 'transparent',
                     backdropFilter: (scrollTop > 0 || scrollLeft > 0) ? 'blur(20px)' : 'none',
                   }}
                 >
@@ -233,7 +234,7 @@ const SensorDataTable = ({
                 <th 
                   className="px-5 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 left-[180px] z-30 w-[150px] min-w-[150px] border-b border-white/10"
                   style={{
-                    background: (scrollTop > 0 || scrollLeft > 0) ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                    background: (scrollTop > 0 || scrollLeft > 0) ? 'rgba(20, 58, 62, 0.98)' : 'transparent',
                     backdropFilter: (scrollTop > 0 || scrollLeft > 0) ? 'blur(20px)' : 'none',
                   }}
                 >
@@ -247,7 +248,7 @@ const SensorDataTable = ({
                     key={idx} 
                     className="px-6 py-3 text-white text-[14px] font-bold ltr:text-left rtl:text-right whitespace-nowrap leading-tight sticky top-0 z-20 border-b border-white/10"
                     style={{
-                      background: scrollTop > 0 ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                      background: scrollTop > 0 ? 'rgba(20, 58, 62, 0.98)' : 'transparent',
                       backdropFilter: scrollTop > 0 ? 'blur(20px)' : 'none',
                     }}
                   >
@@ -260,12 +261,12 @@ const SensorDataTable = ({
             </thead>
             <tbody>
               {displayedData.map((row, index) => (
-                <tr key={index} className={`border-b border-white/10 hover:bg-white/5 transition-colors ${rowHeightClass}`}>
+                <tr key={index} className={`border-b border-white/10 transition-colors ${rowHeightClass}`}>
                   {/* Sticky Column 1 Cell (Date & Time) */}
                   <td 
                     className="px-5 py-3 text-white/90 text-[14px] font-bold whitespace-nowrap sticky left-0 z-10 w-[180px] min-w-[180px] border-b border-white/10"
                     style={{
-                      background: scrollLeft > 0 ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                      background: scrollLeft > 0 ? 'rgba(20, 58, 62, 0.98)' : 'transparent',
                       backdropFilter: scrollLeft > 0 ? 'blur(20px)' : 'none',
                     }}
                   >
@@ -275,7 +276,7 @@ const SensorDataTable = ({
                   <td 
                     className="px-5 py-3 text-white/90 text-[14px] font-bold whitespace-nowrap sticky left-[180px] z-10 w-[150px] min-w-[150px] border-b border-white/10"
                     style={{
-                      background: scrollLeft > 0 ? 'rgba(18, 49, 52, 0.98)' : 'transparent',
+                      background: scrollLeft > 0 ? 'rgba(20, 58, 62, 0.98)' : 'transparent',
                       backdropFilter: scrollLeft > 0 ? 'blur(20px)' : 'none',
                     }}
                   >
@@ -352,6 +353,15 @@ const SensorDataTable = ({
           >
             <ChevronRight size={18} className="rtl:rotate-180" />
           </button>
+        </div>
+      )}
+
+      {/* Tablet Horizontal Scrolling Clue */}
+      {isTablet && (
+        <div className="flex justify-center items-center py-2 mt-1 opacity-60">
+          <ChevronLeft size={14} className="text-[#1DCDDD] animate-pulse" />
+          <span className="text-[11px] text-white font-semibold tracking-widest uppercase mx-3">Swipe horizontally to view more table columns</span>
+          <ChevronRight size={14} className="text-[#1DCDDD] animate-pulse" />
         </div>
       )}
     </div>

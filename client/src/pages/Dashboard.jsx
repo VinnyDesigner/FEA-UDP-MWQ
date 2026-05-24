@@ -45,6 +45,8 @@ const Dashboard = () => {
   const isMobile = windowWidth < 768;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
   const panelWidth = isTablet ? 450 : 520;
+  const currentPanelWidth = isTablet ? windowWidth * 0.8 : panelWidth;
+  const isDesktop = !isMobile && !isTablet;
 
   // Mobile Bottom Sheet State (Framer Motion)
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
@@ -154,24 +156,32 @@ const Dashboard = () => {
                     />
                   </div>
 
-                  <div className="w-full h-[200px] mb-4">
-                    <TemperatureChart 
-                      activeTab={activeTab} 
-                      selectedBuoy={selectedBuoy} 
-                      selectedMetric={selectedMetric} 
-                      isMobile={true} 
-                      selectedDateRange={selectedDateRange}
-                    />
-                  </div>
+                  {activeTab === 'Windrose' ? (
+                    <div className="w-full flex justify-center py-4">
+                      <img src="/windrose.png" alt="Windrose" className="max-w-full rounded-2xl shadow-xl" style={{ maxHeight: '400px', objectFit: 'contain' }} />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="w-full h-[200px] mb-4">
+                        <TemperatureChart 
+                          activeTab={activeTab} 
+                          selectedBuoy={selectedBuoy} 
+                          selectedMetric={selectedMetric} 
+                          isMobile={true} 
+                          selectedDateRange={selectedDateRange}
+                        />
+                      </div>
 
-                  <MetricsGrid 
-                    activeTab={activeTab} 
-                    selectedMetric={selectedMetric} 
-                    setSelectedMetric={setSelectedMetric} 
-                    isMobile={true} 
-                    selectedBuoy={selectedBuoy}
-                    selectedDateRange={selectedDateRange}
-                  />
+                      <MetricsGrid 
+                        activeTab={activeTab} 
+                        selectedMetric={selectedMetric} 
+                        setSelectedMetric={setSelectedMetric} 
+                        isMobile={true} 
+                        selectedBuoy={selectedBuoy}
+                        selectedDateRange={selectedDateRange}
+                      />
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -188,10 +198,12 @@ const Dashboard = () => {
 
             {/* Map controls floating to the left/right of the right panel */}
             <div 
-              className="absolute top-[32px] z-[1000] flex flex-col gap-2.5 transition-all duration-300"
+              className="absolute flex flex-col gap-2.5 transition-all duration-300"
               style={{
-                right: isRtl ? 'auto' : (isRightPanelCollapsed ? '32px' : `${panelWidth + 32}px`),
-                left: isRtl ? (isRightPanelCollapsed ? '32px' : `${panelWidth + 32}px`) : 'auto',
+                zIndex: isTablet ? 10 : 1000,
+                top: isTablet ? '16px' : (isDesktop ? '24px' : '32px'),
+                right: isRtl ? 'auto' : (isTablet ? '16px' : (isRightPanelCollapsed ? (isDesktop ? '24px' : '32px') : `${panelWidth + (isDesktop ? 24 : 32)}px`)),
+                left: isRtl ? (isTablet ? '16px' : (isRightPanelCollapsed ? (isDesktop ? '24px' : '32px') : `${panelWidth + (isDesktop ? 24 : 32)}px`)) : 'auto',
               }}
             >
               {/* Compass/Recenter button */}
@@ -201,41 +213,46 @@ const Dashboard = () => {
                     mapRef.current.setView(selectedBuoy.position, 11);
                   }
                 }}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-white/20 text-[#072227] shadow-lg cursor-pointer hover:bg-gray-50 active:scale-95 transition-all"
+                className={`${isDesktop ? 'w-8 h-8' : 'w-10 h-10'} rounded-full flex items-center justify-center bg-white border border-white/20 text-[#072227] shadow-lg cursor-pointer hover:bg-gray-50 active:scale-95 transition-all`}
                 title="Recenter Map"
               >
-                <Compass size={20} className="text-[#072227]" />
+                <Compass size={isDesktop ? 16 : 20} className="text-[#072227]" />
               </button>
               {/* Zoom In button */}
               <button
                 onClick={() => mapRef.current?.zoomIn()}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-white/20 text-[#072227] shadow-lg cursor-pointer hover:bg-gray-50 active:scale-95 transition-all"
+                className={`${isDesktop ? 'w-8 h-8' : 'w-10 h-10'} rounded-full flex items-center justify-center bg-white border border-white/20 text-[#072227] shadow-lg cursor-pointer hover:bg-gray-50 active:scale-95 transition-all`}
                 title="Zoom In"
               >
-                <Plus size={20} className="text-[#072227]" />
+                <Plus size={isDesktop ? 16 : 20} className="text-[#072227]" />
               </button>
               {/* Zoom Out button */}
               <button
                 onClick={() => mapRef.current?.zoomOut()}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-white/20 text-[#072227] shadow-lg cursor-pointer hover:bg-gray-50 active:scale-95 transition-all"
+                className={`${isDesktop ? 'w-8 h-8' : 'w-10 h-10'} rounded-full flex items-center justify-center bg-white border border-white/20 text-[#072227] shadow-lg cursor-pointer hover:bg-gray-50 active:scale-95 transition-all`}
                 title="Zoom Out"
               >
-                <Minus size={20} className="text-[#072227]" />
+                <Minus size={isDesktop ? 16 : 20} className="text-[#072227]" />
               </button>
             </div>
 
             {/* Buoy Status Card (Floating Left on desktop/tablet) */}
-            <div className="absolute ltr:left-[16px] rtl:right-[16px] bottom-[16px] w-[340px] h-[480px] z-[15]">
-              <BuoyStatusCard activeTab={activeTab} selectedBuoy={selectedBuoy} selectedMetric={selectedMetric} />
-            </div>
+            {(!isTablet || isRightPanelCollapsed) && (
+              <div className={`absolute ltr:left-[16px] rtl:right-[16px] bottom-[16px] ${isTablet ? 'w-[340px] h-[480px]' : 'w-[250px] h-[360px]'} z-[15]`}>
+                <BuoyStatusCard activeTab={activeTab} selectedBuoy={selectedBuoy} selectedMetric={selectedMetric} isDesktop={isDesktop} />
+              </div>
+            )}
 
             {/* Collapsible Vertical Right Panel (Desktop/Tablet) — parent does NOT scroll */}
             <motion.div 
-              className="absolute top-0 bottom-0 z-[15] flex flex-col"
+              className="absolute z-[15] flex flex-col"
               style={{
-                width: `${panelWidth}px`,
-                left: isRtl ? '0px' : 'auto',
-                right: isRtl ? 'auto' : '0px',
+                top: isTablet ? '10%' : '0px',
+                bottom: isTablet ? 'auto' : '0px',
+                height: isTablet ? '80%' : '100%',
+                width: `${currentPanelWidth}px`,
+                left: isRtl ? (isTablet ? '16px' : '0px') : 'auto',
+                right: isRtl ? 'auto' : (isTablet ? '16px' : '0px'),
                 borderRadius: '28px',
                 border: '1.5px solid rgba(255, 255, 255, 0.45)',
                 background: 'radial-gradient(136.65% 89.92% at 50% 50%, rgba(220, 240, 245, 0.45) 0%, rgba(140, 210, 220, 0.55) 100%)',
@@ -246,7 +263,7 @@ const Dashboard = () => {
                 overflow: 'visible'  /* Allows toggle button to be visible outside borders */
               }}
               initial={{ x: 0 }}
-              animate={{ x: isRightPanelCollapsed ? (isRtl ? -panelWidth : panelWidth) : 0 }}
+              animate={{ x: isRightPanelCollapsed ? (isRtl ? -(currentPanelWidth + (isTablet ? 16 : 0)) : (currentPanelWidth + (isTablet ? 16 : 0))) : 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               {/* Collapse / Expand Toggle Button */}
@@ -285,7 +302,7 @@ const Dashboard = () => {
               </button>
 
               {/* ① Dropdowns row — fixed, never scrolls */}
-              <div className="flex-shrink-0 mb-3 pt-5 px-5">
+              <div className="flex-shrink-0 mb-3 pt-5 px-5" style={{ position: 'relative', overflow: 'visible', zIndex: 50 }}>
                 <DashboardHeader 
                   activeTab={activeTab} 
                   setActiveTab={setActiveTab} 
@@ -295,62 +312,70 @@ const Dashboard = () => {
                 />
               </div>
 
-              {/* Scrollbar CSS for metrics section — always visible */}
-              <style>{`
-                .panel-metrics-scrollbar::-webkit-scrollbar { width: 6px; }
-                .panel-metrics-scrollbar::-webkit-scrollbar-track { background: rgba(0,159,172,0.06); border-radius: 10px; }
-                .panel-metrics-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,159,172,0.45); border-radius: 10px; }
-                .panel-metrics-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,159,172,0.7); }
-              `}</style>
-
-              {/* ② Metric Cards — collapsible, independent scrollbar */}
-              <div
-                className="flex-shrink-0 overflow-hidden transition-all duration-300 ease-in-out px-5"
-                style={{ maxHeight: isMetricsCollapsed ? '0px' : '290px', opacity: isMetricsCollapsed ? 0 : 1 }}
-              >
-                {/* Scrollable Container with 1px padding and always-visible scrollbar */}
-                <div className="overflow-y-auto overflow-x-hidden panel-metrics-scrollbar" style={{ maxHeight: '290px', padding: '1px' }}>
-                  <MetricsGrid
-                    activeTab={activeTab}
-                    selectedMetric={selectedMetric}
-                    setSelectedMetric={setSelectedMetric}
-                    selectedBuoy={selectedBuoy}
-                    selectedDateRange={selectedDateRange}
-                  />
+              {activeTab === 'Windrose' ? (
+                <div className="flex-1 flex justify-center items-center overflow-hidden px-5 pb-5 mt-4">
+                  <img src="/windrose.png" alt="Windrose" className="max-w-full max-h-full rounded-[24px]" style={{ objectFit: 'contain' }} />
                 </div>
-              </div>
+              ) : (
+                <>
+                  {/* Scrollbar CSS for metrics section — always visible */}
+                  <style>{`
+                    .panel-metrics-scrollbar::-webkit-scrollbar { width: 6px; }
+                    .panel-metrics-scrollbar::-webkit-scrollbar-track { background: rgba(0,159,172,0.06); border-radius: 10px; }
+                    .panel-metrics-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,159,172,0.45); border-radius: 10px; }
+                    .panel-metrics-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,159,172,0.7); }
+                  `}</style>
 
-              {/* ── Separator with collapse toggle ── */}
-              <div className="flex-shrink-0 flex items-center gap-2 mx-5 my-2">
-                <div className="flex-1 h-[1.5px]" style={{ background: '#ffffff' }} />
-                <button
-                  onClick={() => setIsMetricsCollapsed(!isMetricsCollapsed)}
-                  title={isMetricsCollapsed ? 'Expand metrics' : 'Collapse metrics'}
-                  className="flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 hover:scale-110 cursor-pointer"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.18)',
-                    border: '1px solid #ffffff',
-                    backdropFilter: 'blur(6px)'
-                  }}
-                >
-                  {isMetricsCollapsed
-                    ? <ChevronDown size={12} className="text-white" />
-                    : <ChevronUp size={12} className="text-white" />}
-                </button>
-                <div className="flex-1 h-[1.5px]" style={{ background: '#ffffff' }} />
-              </div>
+                  {/* ② Metric Cards — collapsible, independent scrollbar */}
+                  <div
+                    className="flex-shrink-0 overflow-hidden transition-all duration-300 ease-in-out px-5"
+                    style={{ maxHeight: isMetricsCollapsed ? '0px' : '290px', opacity: isMetricsCollapsed ? 0 : 1 }}
+                  >
+                    {/* Scrollable Container with 1px padding and always-visible scrollbar */}
+                    <div className="overflow-y-auto overflow-x-hidden panel-metrics-scrollbar" style={{ maxHeight: '290px', padding: '1px' }}>
+                      <MetricsGrid
+                        activeTab={activeTab}
+                        selectedMetric={selectedMetric}
+                        setSelectedMetric={setSelectedMetric}
+                        selectedBuoy={selectedBuoy}
+                        selectedDateRange={selectedDateRange}
+                      />
+                    </div>
+                  </div>
 
-              {/* ③ Chart section — takes all remaining height */}
-              <div className="flex-1 min-h-0 overflow-hidden px-5 pb-5">
-                <TemperatureChart
-                  activeTab={activeTab}
-                  selectedBuoy={selectedBuoy}
-                  selectedMetric={selectedMetric}
-                  setSelectedMetric={setSelectedMetric}
-                  selectedDateRange={selectedDateRange}
-                  setSelectedDateRange={setSelectedDateRange}
-                />
-              </div>
+                  {/* ── Separator with collapse toggle ── */}
+                  <div className="flex-shrink-0 flex items-center gap-2 mx-5 my-2">
+                    <div className="flex-1 h-[1.5px]" style={{ background: '#ffffff' }} />
+                    <button
+                      onClick={() => setIsMetricsCollapsed(!isMetricsCollapsed)}
+                      title={isMetricsCollapsed ? 'Expand metrics' : 'Collapse metrics'}
+                      className="flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 hover:scale-110 cursor-pointer"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.18)',
+                        border: '1px solid #ffffff',
+                        backdropFilter: 'blur(6px)'
+                      }}
+                    >
+                      {isMetricsCollapsed
+                        ? <ChevronDown size={12} className="text-white" />
+                        : <ChevronUp size={12} className="text-white" />}
+                    </button>
+                    <div className="flex-1 h-[1.5px]" style={{ background: '#ffffff' }} />
+                  </div>
+
+                  {/* ③ Chart section — takes all remaining height */}
+                  <div className="flex-1 min-h-0 overflow-hidden px-5 pb-5">
+                    <TemperatureChart
+                      activeTab={activeTab}
+                      selectedBuoy={selectedBuoy}
+                      selectedMetric={selectedMetric}
+                      setSelectedMetric={setSelectedMetric}
+                      selectedDateRange={selectedDateRange}
+                      setSelectedDateRange={setSelectedDateRange}
+                    />
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
         )}

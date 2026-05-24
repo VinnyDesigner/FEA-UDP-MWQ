@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, Activity, RefreshCw, Bell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
+const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false, isDesktop = false }) => {
   const { t } = useTranslation();
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -50,13 +50,13 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
       ? '0 2px 8px rgba(16, 185, 129, 0.15), inset 0 2px 4px rgba(255,255,255,0.05)' 
       : '0 4px 12px rgba(239, 68, 68, 0.25), inset 0 2px 4px rgba(255,255,255,0.05)',
     borderRadius: '30px',
-    padding: '8px 18px',
+    padding: isDesktop ? '4px 8px' : '8px 18px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
+    gap: isDesktop ? '4px' : '8px',
     color: '#FFFFFF',
-    fontSize: '12.5px',
+    fontSize: isDesktop ? '10px' : '12.5px',
     fontWeight: '600',
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
@@ -68,7 +68,7 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
     if (isNormal) {
       return (
         <Bell 
-          size={14} 
+          size={isDesktop ? 12 : 14} 
           className="text-[#10B981] drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" 
           fill="#10B981" 
         />
@@ -77,7 +77,7 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
     return (
       <div className="relative flex items-center justify-center">
         <Bell 
-          size={14} 
+          size={isDesktop ? 12 : 14} 
           className="text-[#EF4444] drop-shadow-[0_0_8px_rgba(239,68,68,0.9)] animate-bounce" 
           fill="#EF4444" 
         />
@@ -87,7 +87,7 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
 
   const renderAlarmPills = () => (
     <div className="flex flex-col items-center w-full z-10">
-      <div className="flex gap-3 mb-3 justify-center w-full max-w-[340px]">
+      <div className="flex gap-2 mb-2 justify-center w-full max-w-[340px]">
         {/* Comm Status Pill */}
         <div className="flex-1 flex justify-center min-w-0">
           <button style={alarmBtnStyle(alarms.comm)} className="w-full truncate hover:scale-[1.02] active:scale-[0.98] outline-none">
@@ -106,7 +106,7 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
       </div>
 
       {/* Enclosure Door Open Pill */}
-      <div className="flex justify-center w-full mb-3 max-w-[340px]">
+      <div className="flex justify-center w-full mb-2 max-w-[340px]">
         <button style={alarmBtnStyle(alarms.door)} className="w-[85%] hover:scale-[1.02] active:scale-[0.98] outline-none">
           {renderAlarmIcon(alarms.door)}
           <span className="truncate">{t('dashboard.enclosureDoorOpen')}</span>
@@ -216,8 +216,9 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
                 <RefreshCw size={20} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:rotate-180" />
               </button>
 
+              {/* Buoy image — large, top */}
               <div className="flex justify-center relative z-10 mb-4 mt-2">
-                <div className="w-24 h-24 flex items-center justify-center">
+                <div className="w-28 h-28 flex items-center justify-center">
                   <img 
                     src="/assets/buoy-icon.png" 
                     alt="Buoy Illustration" 
@@ -226,26 +227,30 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center z-10 text-center mb-4">
+              {/* Name & coords — centered below image */}
+              <div className="flex flex-col items-center z-10 text-center">
+                <p className="text-[11px] text-white/50 font-medium mb-1 tracking-wider uppercase">{t('dashboard.locationName') || 'Location Name'}</p>
                 <div className="flex items-center justify-center gap-2 mb-3">
                   <div className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981] animate-pulse" />
                   <p className="text-[20px] font-bold text-white tracking-wide">{t(`stations.${buoyNameKey}`)}</p>
                 </div>
                 <div 
                   className="px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-3 text-[11px] text-white/80 font-medium"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    backdropFilter: 'blur(4px)'
-                  }}
+                  style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(4px)' }}
                 >
                   <span>{t('dashboard.longitude')}: {coordinates.long}</span>
                   <span>{t('dashboard.latitude')}: {coordinates.lat}</span>
                 </div>
               </div>
 
+              {/* Spacer pushes pills to the bottom */}
+              <div className="flex-1" />
+
+              {/* Alarm pills — anchored to bottom */}
               {renderAlarmPills()}
 
-              <div className="flex justify-between items-center z-10 pt-3 border-t border-white/10 mt-auto">
+              {/* Footer */}
+              <div className="flex justify-between items-center z-10 pt-3 border-t border-white/10 mt-3">
                 <div className="flex items-center gap-1.5 text-[10px] text-white/60">
                   <Clock size={12} />
                   <span>{t('dashboard.updated')} {updatedTime}</span>
@@ -257,12 +262,12 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
             </div>
           )}
 
-          {/* DESKTOP & TABLET RENDER (Unified beautiful vertical layout) */}
+          {/* DESKTOP & TABLET RENDER */}
           {!isMobile && (
             <div
               className="flex flex-col w-full h-full relative"
               style={{
-                padding: '24px',
+                padding: isDesktop ? '16px' : '24px',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
                 borderRadius: '28px',
               }}
@@ -274,13 +279,14 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
               />
               <button 
                 onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
-                className="absolute top-6 right-6 z-20 text-white/80 hover:text-white hover:scale-105 active:scale-95 transition-all outline-none bg-transparent border-0 cursor-pointer"
+                className="absolute top-4 right-4 z-20 text-white/80 hover:text-white hover:scale-105 active:scale-95 transition-all outline-none bg-transparent border-0 cursor-pointer"
               >
-                <RefreshCw size={20} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:rotate-180" />
+                <RefreshCw size={isDesktop ? 16 : 20} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:rotate-180" />
               </button>
 
-              <div className="flex justify-center relative z-10 mb-4 mt-6">
-                <div className="w-32 h-32 flex items-center justify-center">
+              {/* Buoy image — large, upper section */}
+              <div className={`flex justify-center relative z-10 ${isDesktop ? 'mb-2 mt-2' : 'mb-4 mt-6'}`}>
+                <div className={`${isDesktop ? 'w-20 h-20' : 'w-32 h-32'} flex items-center justify-center`}>
                   <img 
                     src="/assets/buoy-icon.png" 
                     alt="Buoy Illustration" 
@@ -289,31 +295,39 @@ const BuoyStatusCard = ({ activeTab, selectedBuoy, isMobile = false }) => {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center z-10 text-center mb-8">
-                <div className="flex items-center justify-center gap-2.5 mb-4">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_10px_#10B981] animate-pulse" />
-                  <h2 className="text-3xl font-extrabold text-white tracking-wide">{t(`stations.${buoyNameKey}`)}</h2>
+              {/* Location name label + buoy name + coords — middle section */}
+              <div className={`flex flex-col items-center z-10 text-center ${isDesktop ? 'mb-2' : 'mb-4'}`}>
+                <p className={`text-white/50 font-medium tracking-wider uppercase ${isDesktop ? 'text-[9px] mb-1' : 'text-[11px] mb-2'}`}>
+                  {t('dashboard.locationName') || 'Location Name'}
+                </p>
+                <div className={`flex items-center justify-center gap-2 ${isDesktop ? 'mb-2' : 'mb-3'}`}>
+                  <div className={`rounded-full bg-[#10B981] shadow-[0_0_10px_#10B981] animate-pulse ${isDesktop ? 'w-2 h-2' : 'w-2.5 h-2.5'}`} />
+                  <h2 className={`${isDesktop ? 'text-xl font-bold' : 'text-3xl font-extrabold'} text-white tracking-wide`}>
+                    {t(`stations.${buoyNameKey}`)}
+                  </h2>
                 </div>
                 <div 
-                  className="px-5 py-1.5 rounded-full border border-white/10 flex items-center gap-4 text-[12.5px] text-white/85 font-medium shadow-inner"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    backdropFilter: 'blur(4px)'
-                  }}
+                  className={`${isDesktop ? 'px-3.5 py-1 text-[10px]' : 'px-5 py-1.5 text-[12.5px]'} rounded-full border border-white/10 flex items-center gap-3.5 text-white/85 font-medium shadow-inner`}
+                  style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(4px)' }}
                 >
                   <span>{t('dashboard.longitude')}: {coordinates.long}</span>
                   <span>{t('dashboard.latitude')}: {coordinates.lat}</span>
                 </div>
               </div>
 
+              {/* Spacer — pushes pills to the bottom */}
+              <div className="flex-1" />
+
+              {/* Alarm pills — anchored to bottom */}
               {renderAlarmPills()}
 
-              <div className="flex justify-between items-center z-10 pt-4 border-t border-white/10 mt-auto">
-                <div className="flex items-center gap-1.5 text-[11.5px] text-white/60">
-                  <Clock size={13} />
+              {/* Footer */}
+              <div className={`flex justify-between items-center z-10 pt-3 border-t border-white/10 mt-3 ${isDesktop ? 'text-[9.5px]' : 'text-[11.5px]'}`}>
+                <div className="flex items-center gap-1.5 text-white/60">
+                  <Clock size={isDesktop ? 11 : 13} />
                   <span>{t('dashboard.updated')} {updatedTime}</span>
                 </div>
-                <span className="text-[11.5px] text-white/60">
+                <span className="text-white/60">
                   {t('dashboard.dataInterval')}: {dataInterval}
                 </span>
               </div>

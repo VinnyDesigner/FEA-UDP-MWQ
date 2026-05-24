@@ -78,3 +78,50 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
 }
+
+/* ── Desktop Sidebar 20% Reduction (>= 1024px) ── */
+@media (min-width: 1024px) {
+  /* Sidebar width reduced from 92px by 20% -> 74px */
+  aside.hidden.md\:flex {
+    width: 74px !important;
+    min-width: 74px !important;
+  }
+  
+  /* Spacing/margin shifted from 92px to 74px */
+  .md\:ml-\[92px\] {
+    margin-left: 74px !important;
+  }
+
+  /* Inner pill width reduced from 60px by 20% -> 48px */
+  aside.hidden.md\:flex div[style*="width: 60px"],
+  aside.hidden.md\:flex div[style*="width:60px"],
+  aside.hidden.md\:flex .w-\[60px\] {
+    width: 48px !important;
+  }
+  
+  /* Inner navigation buttons reduced from 42px by 20% -> 34px */
+  aside.hidden.md\:flex .w-\[42px\],
+  aside.hidden.md\:flex .h-\[42px\] {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  /* Inner icon images reduced slightly by 20% */
+  aside.hidden.md\:flex img.w-5.h-5,
+  aside.hidden.md\:flex img[class*="w-5"][class*="h-5"] {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Bottom profile and logout triggers */
+  aside.hidden.md\:flex button.w-\[42px\] svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Tooltip absolute left shifted accordingly */
+  aside.hidden.md\:flex .left-\[70px\],
+  aside.hidden.md\:flex span.left-\[70px\] {
+    left: 56px !important;
+  }
+}

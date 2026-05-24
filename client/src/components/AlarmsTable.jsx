@@ -123,7 +123,7 @@ const AlarmsTable = ({ isMobile = false }) => {
             </thead>
             <tbody>
               {alarmsData.map((row, index) => (
-                <tr key={index} className="border-b border-white/10 h-[56px] hover:bg-white/5 transition-colors">
+                <tr key={index} className="border-b border-white/10 h-[56px] transition-colors">
                   <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.dateTime}</td>
                   <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.stationName}</td>
                   <td className="px-6 py-3 text-white/90 text-[14px] whitespace-nowrap">{row.alertType}</td>
