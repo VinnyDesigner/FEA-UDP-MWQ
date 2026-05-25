@@ -206,7 +206,21 @@ const SensorDataFilters = ({
     <div className="flex flex-row items-center gap-2 md:gap-3 w-full lg:w-auto lg:justify-end">
       
       {isTablet ? (
-        <>
+        <div className="flex items-center gap-2">
+          {/* Station Name Dropdown (Tablet) */}
+          <button 
+            ref={buoyBtnRef}
+            onClick={() => setIsBuoyOpen(!isBuoyOpen)}
+            className="flex items-center justify-between gap-2 px-[19.2px] py-[8px] text-[9.6px] font-semibold transition-all hover:brightness-110 active:scale-95 flex-1 lg:flex-none lg:w-auto min-w-0 lg:min-w-[150px]"
+            style={{...filterStyle, height: 'auto'}}
+          >
+            <div className="flex items-center gap-2 text-ellipsis overflow-hidden">
+              <MapPin size={10} className="text-white/70 flex-shrink-0" />
+              <span className="whitespace-nowrap text-ellipsis overflow-hidden">{getBuoyTriggerLabel(selectedBuoy, false)}</span>
+            </div>
+            <ChevronDown size={10} className={`transition-transform duration-300 ${isBuoyOpen ? 'rotate-180' : ''} text-white/70 flex-shrink-0`} />
+          </button>
+
           <button 
             ref={filterBtnRef}
             onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -258,84 +272,6 @@ const SensorDataFilters = ({
                         {opt}
                       </div>
                     ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Select Station Name */}
-              <div className="flex flex-col gap-1.5 relative text-left">
-                <span className="text-white text-[11px] font-bold tracking-wider uppercase opacity-75">Location</span>
-                <div 
-                  onClick={() => setOpenSelect(openSelect === 'buoy' ? null : 'buoy')}
-                  className="flex items-center justify-between px-3.5 py-2 bg-white/5 border border-white/10 rounded-[10px] text-white text-[13px] font-semibold cursor-pointer hover:bg-white/10 transition-colors select-none"
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <MapPin size={13} className="text-white/60 flex-shrink-0" />
-                    <span className="truncate">{getBuoyTriggerLabel(tempBuoy, true)}</span>
-                  </div>
-                  <ChevronDown size={13} className={`text-white/60 transition-transform ${openSelect === 'buoy' ? 'rotate-180' : ''}`} />
-                </div>
-                {openSelect === 'buoy' && (
-                  <div className="absolute top-[100%] left-0 w-full mt-1 bg-[#153437] border border-white/10 rounded-[10px] z-50 py-1 shadow-2xl max-h-[200px] overflow-y-auto custom-scrollbar">
-                    {buoys.map((buoy) => {
-                      const isBatteryHealth = tempSubTab === 'Battery Health';
-                      const individualStations = ['Near Shore Buoy', 'Offshore Buoy', 'Al Aqah Buoy', 'North Dibbah'];
-                      const isChecked = buoy === 'All Stations'
-                        ? individualStations.every(s => tempSelectedArray.includes(s))
-                        : tempSelectedArray.includes(buoy);
-
-                      return (
-                        <div 
-                          key={buoy}
-                          onClick={() => {
-                            if (isBatteryHealth) {
-                              let nextSelected;
-                              if (buoy === 'All Stations') {
-                                if (individualStations.every(s => tempSelectedArray.includes(s))) {
-                                  nextSelected = ['Near Shore Buoy'];
-                                } else {
-                                  nextSelected = individualStations;
-                                }
-                              } else {
-                                if (tempSelectedArray.includes(buoy)) {
-                                  if (tempSelectedArray.length > 1) {
-                                    nextSelected = tempSelectedArray.filter(s => s !== buoy);
-                                  } else {
-                                    nextSelected = tempSelectedArray;
-                                  }
-                                } else {
-                                  nextSelected = [...tempSelectedArray, buoy];
-                                }
-                              }
-                              setTempBuoy(nextSelected);
-                            } else {
-                              setTempBuoy(buoy);
-                              setOpenSelect(null);
-                            }
-                          }}
-                          className="px-3.5 py-2 hover:bg-white/10 cursor-pointer transition-colors flex items-center gap-3"
-                        >
-                          {isBatteryHealth ? (
-                            <div className={`w-[16px] h-[16px] rounded-[4px] border-2 transition-all flex items-center justify-center ${
-                              isChecked ? 'border-[#009FAC] bg-[#009FAC]' : 'border-white/40 bg-transparent'
-                            }`}>
-                              {isChecked && (
-                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                              )}
-                            </div>
-                          ) : (
-                            <div className={`w-[16px] h-[16px] rounded-full border-2 flex items-center justify-center transition-all ${
-                              tempBuoy === buoy ? 'border-[#009FAC] bg-[#009FAC]' : 'border-white/40 bg-transparent'
-                            }`}>
-                              {tempBuoy === buoy && <div className="w-[6px] h-[6px] bg-white rounded-full" />}
-                            </div>
-                          )}
-                          <span className="text-white text-[13px] font-medium">{buoy}</span>
-                        </div>
-                      );
-                    })}
                   </div>
                 )}
               </div>
@@ -409,7 +345,7 @@ const SensorDataFilters = ({
             </div>,
             document.body
           )}
-        </>
+        </div>
       ) : (
         <>
           {/* 1. Station Health Sub-Tab Selector Dropdown */}
